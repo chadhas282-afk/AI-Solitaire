@@ -238,3 +238,43 @@ export function findCardInTableau(cardId: string, tableau: Card[][]): { colIndex
       return { colIndex, rowIndex };
     }
   }
+  return null;
+}
+
+export function findCard(cardId: string, state: GameState): { pile: PileRef; card: Card } | null {
+
+  for (const card of state.waste) {
+    if (card.id === cardId) return { pile: { type: 'waste' }, card };
+  }
+
+  for (let i = 0; i < state.foundations.length; i++) {
+    for (const card of state.foundations[i]) {
+      if (card.id === cardId) return { pile: { type: 'foundation', index: i }, card };
+    }
+  }
+
+  for (let i = 0; i < state.tableau.length; i++) {
+    for (const card of state.tableau[i]) {
+      if (card.id === cardId) return { pile: { type: 'tableau', index: i }, card };
+    }
+  }
+
+  for (const card of state.stock) {
+    if (card.id === cardId) return { pile: { type: 'stock' }, card };
+  }
+  return null;
+}
+
+export function wouldRevealCard(cardId: string, tableau: Card[][]): boolean {
+  for (const col of tableau) {
+    const idx = col.findIndex(c => c.id === cardId);
+    if (idx === -1) continue;
+
+    if (idx > 0 && !col[idx - 1].faceUp) return true;
+    if (idx === 0) return false; 
+  }
+  return false;
+}
+
+export function hasAnyValidMove(state: GameState): boolean {
+  const { stock, waste, foundations, tableau } = state;

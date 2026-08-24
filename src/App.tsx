@@ -38,3 +38,43 @@ export interface ParticleEvent {
 
 export interface GameSnapshot {
   stock: Card[];
+  waste: Card[];
+  foundations: [Card[], Card[], Card[], Card[]];
+  tableau: Card[][];
+  score: number;
+  moves: number;
+  combo: number;
+}
+
+export interface GameState {
+  stock: Card[];
+  waste: Card[];
+  foundations: [Card[], Card[], Card[], Card[]];
+  tableau: Card[][];
+  score: number;
+  moves: number;
+  drawCount: DrawCount;
+  hint: HintMove | null;
+  history: GameSnapshot[];
+  won: boolean;
+  gameOver: boolean;
+  autoCompleteAvailable: boolean;
+  isAutoCompleting: boolean;
+  startTime: number | null;
+  elapsedTime: number;
+  timerActive: boolean;
+  stockRecycles: number;
+  lastAction: string;
+  combo: number;           
+  bestCombo: number;
+  particleEvents: ParticleEvent[];
+  toastMessage: string | null;
+  toastKey: number;
+  foundationCount: number; 
+}
+
+export const SUIT_ORDER: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
+
+export const SUIT_SYMBOLS: Record<Suit, string> = {
+  spades: '♠',
+  hearts: '♥',

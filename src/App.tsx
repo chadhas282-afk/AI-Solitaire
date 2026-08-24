@@ -158,3 +158,43 @@ export function createInitialState(drawCount: DrawCount = 1): GameState {
     hint: null,
     history: [],
     won: false,
+    gameOver: false,
+    autoCompleteAvailable: false,
+    isAutoCompleting: false,
+    startTime: Date.now(),
+    elapsedTime: 0,
+    timerActive: true,
+    stockRecycles: 0,
+    lastAction: '',
+    combo: 0,
+    bestCombo: 0,
+    particleEvents: [],
+    toastMessage: null,
+    toastKey: 0,
+    foundationCount: 0,
+  };
+}
+
+export function foundationIndexForSuit(suit: Suit): number {
+  return SUIT_ORDER.indexOf(suit);
+}
+
+export function cloneState(state: GameState): GameState {
+  return {
+    ...state,
+    stock: state.stock.map(c => ({ ...c })),
+    waste: state.waste.map(c => ({ ...c })),
+    foundations: state.foundations.map(f => f.map(c => ({ ...c }))) as [Card[], Card[], Card[], Card[]],
+    tableau: state.tableau.map(col => col.map(c => ({ ...c }))),
+  };
+}
+
+export function snapshotState(state: GameState) {
+  return {
+    stock: state.stock.map(c => ({ ...c })),
+    waste: state.waste.map(c => ({ ...c })),
+    foundations: state.foundations.map(f => f.map(c => ({ ...c }))) as [Card[], Card[], Card[], Card[]],
+    tableau: state.tableau.map(col => col.map(c => ({ ...c }))),
+    score: state.score,
+    moves: state.moves,
+    combo: state.combo,

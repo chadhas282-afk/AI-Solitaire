@@ -318,3 +318,42 @@ export function canAutoComplete(state: GameState): boolean {
     if (col.some(c => !c.faceUp)) return false;
   }
   return true;
+  }
+
+export function isWon(state: GameState): boolean {
+  return state.foundations.reduce((sum, f) => sum + f.length, 0) === 52;
+}
+
+export function findBestHint(state: GameState): HintMove | null {
+  const { stock, waste, foundations, tableau } = state;
+
+  if (waste.length > 0) {
+    const card = waste[waste.length - 1];
+    for (let fi = 0; fi < foundations.length; fi++) {
+      if (canMoveToFoundation(card, foundations[fi])) {
+        return {
+          cardId: card.id,
+          fromPile: { type: 'waste' },
+          toPile: { type: 'foundation', index: fi },
+          description: `Move ${rankLabel(card.rank)}${suitSymbol(card.suit)} to Foundation`,
+        };
+      }
+    }
+  }
+
+  for (let ti = 0; ti < tableau.length; ti++) {
+    const col = tableau[ti];
+    if (col.length === 0) continue;
+    const card = col[col.length - 1];
+    if (!card.faceUp) continue;
+    for (let fi = 0; fi < foundations.length; fi++) {
+      if (canMoveToFoundation(card, foundations[fi])) {
+        return {
+          cardId: card.id,
+          fromPile: { type: 'tableau', index: ti },
+          toPile: { type: 'foundation', index: fi },
+          description: `Move ${rankLabel(card.rank)}${suitSymbol(card.suit)} to Foundation`,
+        };
+      }
+    }
+  }

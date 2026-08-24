@@ -357,3 +357,44 @@ export function findBestHint(state: GameState): HintMove | null {
       }
     }
   }
+
+  for (let fromCol = 0; fromCol < tableau.length; fromCol++) {
+    const col = tableau[fromCol];
+
+    const firstFaceUpIdx = col.findIndex(c => c.faceUp);
+    if (firstFaceUpIdx === -1) continue;
+
+    if (firstFaceUpIdx === 0) continue;
+
+    const card = col[firstFaceUpIdx]; 
+    for (let toCol = 0; toCol < tableau.length; toCol++) {
+      if (toCol === fromCol) continue;
+      if (canMoveToTableau(card, tableau[toCol])) {
+        return {
+          cardId: card.id,
+          fromPile: { type: 'tableau', index: fromCol },
+          toPile: { type: 'tableau', index: toCol },
+          description: `Move sequence to reveal hidden card`,
+        };
+      }
+    }
+  }
+
+  if (waste.length > 0) {
+    const card = waste[waste.length - 1];
+    for (let ti = 0; ti < tableau.length; ti++) {
+      if (canMoveToTableau(card, tableau[ti])) {
+        return {
+          cardId: card.id,
+          fromPile: { type: 'waste' },
+          toPile: { type: 'tableau', index: ti },
+          description: `Move ${rankLabel(card.rank)}${suitSymbol(card.suit)} from Waste to Tableau`,
+        };
+      }
+    }
+  }
+
+  for (let fromCol = 0; fromCol < tableau.length; fromCol++) {
+    const col = tableau[fromCol];
+    const firstFaceUpIdx = col.findIndex(c => c.faceUp);
+    if (firstFaceUpIdx === -1) continue;

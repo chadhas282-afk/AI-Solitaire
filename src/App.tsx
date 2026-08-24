@@ -198,3 +198,43 @@ export function snapshotState(state: GameState) {
     score: state.score,
     moves: state.moves,
     combo: state.combo,
+    };
+}
+
+export function getColor(suit: Suit): Color {
+  return SUIT_COLORS[suit];
+}
+
+export function canMoveToFoundation(card: Card, foundation: Card[]): boolean {
+  if (!card.faceUp) return false;
+  if (foundation.length === 0) {
+    return card.rank === 1; 
+  }
+  const top = foundation[foundation.length - 1];
+  return card.suit === top.suit && card.rank === top.rank + 1;
+}
+
+export function canMoveToTableau(card: Card, tableau: Card[]): boolean {
+  if (!card.faceUp) return false;
+  if (tableau.length === 0) {
+    return card.rank === 13; 
+  }
+  const top = tableau[tableau.length - 1];
+  if (!top.faceUp) return false;
+  return getColor(card.suit) !== getColor(top.suit) && card.rank === top.rank - 1;
+}
+
+export function getMovableSequence(column: Card[], fromIndex: number): Card[] {
+  if (fromIndex < 0 || fromIndex >= column.length) return [];
+
+  if (!column[fromIndex].faceUp) return [];
+  return column.slice(fromIndex);
+}
+
+export function findCardInTableau(cardId: string, tableau: Card[][]): { colIndex: number; rowIndex: number } | null {
+  for (let colIndex = 0; colIndex < tableau.length; colIndex++) {
+    const rowIndex = tableau[colIndex].findIndex(c => c.id === cardId);
+    if (rowIndex !== -1) {
+      return { colIndex, rowIndex };
+    }
+  }

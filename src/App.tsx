@@ -278,3 +278,43 @@ export function wouldRevealCard(cardId: string, tableau: Card[][]): boolean {
 
 export function hasAnyValidMove(state: GameState): boolean {
   const { stock, waste, foundations, tableau } = state;
+
+  if (stock.length > 0) return true;
+  if (waste.length > 0) return true;
+
+  const allVisibleCards: { card: Card; pile: PileRef }[] = [];
+
+  if (waste.length > 0) {
+    allVisibleCards.push({ card: waste[waste.length - 1], pile: { type: 'waste' } });
+  }
+
+  for (let i = 0; i < tableau.length; i++) {
+    const col = tableau[i];
+    for (let j = col.length - 1; j >= 0; j--) {
+      if (col[j].faceUp) {
+        allVisibleCards.push({ card: col[j], pile: { type: 'tableau', index: i } });
+
+        if (j === col.findIndex(c => c.faceUp)) break;
+      }
+    }
+  }
+
+  for (const { card } of allVisibleCards) {
+
+    for (const f of foundations) {
+      if (canMoveToFoundation(card, f)) return true;
+    }
+
+    for (const col of tableau) {
+      if (canMoveToTableau(card, col)) return true;
+    }
+  }
+
+  return false;
+}
+
+export function canAutoComplete(state: GameState): boolean {
+  for (const col of state.tableau) {
+    if (col.some(c => !c.faceUp)) return false;
+  }
+  return true;

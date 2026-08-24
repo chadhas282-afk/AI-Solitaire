@@ -118,3 +118,43 @@ export function createDeck(): Card[] {
     for (const rank of RANKS) {
       deck.push({ id: `${suit}-${rank}`, suit, rank, faceUp: false });
     }
+     }
+  return deck;
+}
+
+export function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export function createInitialState(drawCount: DrawCount = 1): GameState {
+  const deck = shuffle(createDeck());
+  const tableau: Card[][] = Array.from({ length: 7 }, () => []);
+  let deckIdx = 0;
+
+  for (let col = 0; col < 7; col++) {
+    for (let row = 0; row <= col; row++) {
+      const card = { ...deck[deckIdx++] };
+      card.faceUp = row === col;
+      tableau[col].push(card);
+    }
+  }
+
+  const stock: Card[] = deck.slice(deckIdx).map(c => ({ ...c, faceUp: false }));
+  const foundations: [Card[], Card[], Card[], Card[]] = [[], [], [], []];
+
+  return {
+    stock,
+    waste: [],
+    foundations,
+    tableau,
+    score: 0,
+    moves: 0,
+    drawCount,
+    hint: null,
+    history: [],
+    won: false,

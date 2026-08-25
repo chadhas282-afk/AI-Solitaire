@@ -1078,3 +1078,43 @@ export function CardComponent({
 
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
           <span className="text-3xl sm:text-4xl lg:text-[2.6rem] leading-none select-none" style={{
+            color: styles.text,
+            textShadow: `0 2px 8px ${styles.shadow}`,
+          }}>{suitSymbol}</span>
+          <span className="text-[10px] sm:text-xs font-display font-bold uppercase tracking-widest opacity-40" style={{ color: styles.text }}>
+            {rankLabel === 'J' ? 'Jack' : rankLabel === 'Q' ? 'Queen' : 'King'}
+          </span>
+        </div>
+      ) : (
+
+        <PipGrid rank={card.rank} symbol={suitSymbol} color={styles.text} />
+      )}
+
+      <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180" style={{ color: styles.text }}>
+        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLabel}</span>
+        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSymbol}</span>
+      </div>
+
+      <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/50 to-transparent rounded-t-xl pointer-events-none" />
+    </div>
+  );
+}
+
+function PipGrid({ rank, symbol, color }: { rank: number; symbol: string; color: string }) {
+  const pips = getPipPositions(rank);
+  return (
+    <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-3">
+      <div className="relative w-full h-full">
+        {pips.map((pip, i) => (
+          <div
+            key={i}
+            className="absolute select-none text-[10px] sm:text-xs font-bold leading-none"
+            style={{
+              color,
+              left: `${pip.x}%`,
+              top: `${pip.y}%`,
+              transform: `translate(-50%, -50%) ${pip.flip ? 'rotate(180deg)' : ''}`,
+              opacity: 0.85,
+            }}
+          >
+            {symbol}

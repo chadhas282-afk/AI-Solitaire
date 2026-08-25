@@ -1238,3 +1238,43 @@ export function StockPile() {
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
+              {state.stockRecycles > 0 && (
+                <span className="text-[10px] text-white/25 font-mono">{state.stockRecycles}×</span>
+              )}
+            </div>
+          ) : (
+
+            <div className="absolute inset-0" style={{
+              background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2847 50%, #1a3560 100%)',
+            }}>
+
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: `repeating-linear-gradient(45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px),
+                                  repeating-linear-gradient(-45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px)`,
+              }} />
+              <div className="absolute inset-[3px] rounded-lg border border-blue-300/10" />
+              <div className="absolute inset-0 flex items-end justify-end p-2">
+                <span className="text-[10px] font-mono text-blue-300/30">{state.stock.length}</span>
+              </div>
+              <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/8 to-transparent rounded-t-xl" />
+            </div>
+          )}
+        </div>
+      </button>
+      <span className="text-[9px] text-white/25 uppercase tracking-widest font-medium">Stock</span>
+    </div>
+  );
+}
+
+export function WastePile() {
+  const { state, dispatch } = useGame();
+  const { waste, drawCount } = state;
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'droppable::waste',
+    data: { pileRef: { type: 'waste' } },
+  });
+
+  if (waste.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-1.5"></div>

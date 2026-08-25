@@ -838,3 +838,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 function checkGameStatus(state: GameState): GameState {
   const won = isWon(state);
   const autoCompleteAvailable = !won && canAutoComplete(state);
+  const gameOver = !won && !autoCompleteAvailable && isDeadEnd(state);
+  return { ...state, won, gameOver, autoCompleteAvailable, timerActive: !won && !gameOver };
+}
+
+interface GameContextValue {
+  state: GameState;
+  dispatch: React.Dispatch<GameAction>;
+}
+
+const GameContext = createContext<GameContextValue | null>(null);
+
+export function GameProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(gameReducer, undefined, () => createInitialState(1));
+
+  useEffect(() => {
+    if (!state.timerActive) return;
+    const interval = setInterval(() => dispatch({ type: 'TICK_TIMER' }), 1000);
+    return () => clearInterval(interval);
+  }, [state.timerActive]);
+
+  const autoCompleteRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (state.isAutoCompleting && !state.won) {
+      autoCompleteRef.current = setInterval(() => dispatch({ type: 'AUTO_COMPLETE_STEP' }), 150);
+    } else {
+      if (autoCompleteRef.current) { clearInterval(autoCompleteRef.current); autoCompleteRef.current = null; }
+    }
+    return () => { if (autoCompleteRef.current) clearInterval(autoCompleteRef.current); };
+  }, [state.isAutoCompleting, state.won]);
+
+  useEffect(() => {
+    if (state.particleEvents.length === 0) return;
+    const t = setTimeout(() => dispatch({ type: 'CLEAR_PARTICLES' }), 2000);
+    return () => clearTimeout(t);
+  }, [state.particleEvents.length]);
+
+  const wrappedDispatch = useCallback((action: GameAction) => {
+    if (
+      action.type !== 'HINT' &&
+      action.type !== 'CLEAR_HINT' &&

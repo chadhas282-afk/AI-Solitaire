@@ -718,3 +718,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         const newCol = col.slice(0, -1);
         if (newCol.length > 0 && !newCol[newCol.length - 1].faceUp) {
           newCol[newCol.length - 1] = { ...newCol[newCol.length - 1], faceUp: true };
+          scoreChange += POINTS.TABLEAU_FLIP;
+        }
+        const newTab = [...state.tableau];
+        newTab[colIdx] = newCol;
+        newState.tableau = newTab;
+      } else return state;
+
+      if (!card) return state;
+      if (!canMoveToFoundation(card, state.foundations[foundationIndex])) return state;
+
+      const newFoundations = state.foundations.map((f, i) =>
+        i === foundationIndex ? [...f, { ...card!, faceUp: true }] : f
+      ) as GameState['foundations'];
+
+      const newCombo = state.combo + 1;
+      const comboBonus = newCombo > 1 ? POINTS.COMBO_BONUS * (newCombo - 1) : 0;
+      const toastMessage = getComboMessage(newCombo);
+      const bestCombo = Math.max(state.bestCombo, newCombo);
+
+      const newParticles: ParticleEvent[] = particlePos
+        ? [...state.particleEvents, { id: particleCounter++, ...particlePos, suit: card.suit }]
+        : state.particleEvents;
+
+      const foundationCount = state.foundationCount + 1;
+
+      newState = {
+        ...newState,
+        foundations: newFoundations,
+        history,
+        score: Math.max(0, state.score + scoreChange + comboBonus),
+        moves: state.moves + 1,
+        hint: null,
+        combo: newCombo,
+        bestCombo,
+        particleEvents: newParticles,
+        toastMessage,
+        toastKey: state.toastKey + 1,
+        foundationCount,
+        lastAction: 'Foundation move',
+      };

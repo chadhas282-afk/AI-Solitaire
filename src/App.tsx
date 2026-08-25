@@ -1038,3 +1038,43 @@ export function CardComponent({
       </div>
     );
   }
+
+  const rankLabel = RANK_LABELS[card.rank];
+  const suitSymbol = SUIT_SYMBOLS[card.suit];
+  const isFaceCard = card.rank >= 11;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        ...style,
+        ...dragStyle,
+        background: `linear-gradient(145deg, #fffef7 0%, ${styles.accent} 100%)`,
+        boxShadow: isDragging
+          ? 'none'
+          : `0 3px 8px ${styles.shadow}, 0 1px 3px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9)`,
+      }}
+      onDoubleClick={handleDoubleClick}
+      className={`
+        relative rounded-xl cursor-grab active:cursor-grabbing no-select
+        w-[4.2rem] h-[5.8rem] sm:w-[4.8rem] sm:h-[6.8rem] lg:w-[5.2rem] lg:h-[7.2rem]
+        border border-gray-200/80
+        transition-all duration-150 overflow-hidden
+        ${isDragging ? 'opacity-0' : 'opacity-100'}
+        ${isHintSource ? 'hint-source' : ''}
+        ${!isDragOverlay && card.faceUp ? 'hover:-translate-y-1 hover:shadow-lg' : ''}
+        select-none
+      `}
+      {...attributes}
+      {...listeners}
+    >
+
+      <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none" style={{ color: styles.text }}>
+        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLabel}</span>
+        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSymbol}</span>
+      </div>
+
+      {isFaceCard ? (
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+          <span className="text-3xl sm:text-4xl lg:text-[2.6rem] leading-none select-none" style={{

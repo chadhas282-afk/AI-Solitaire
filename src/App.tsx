@@ -398,3 +398,43 @@ export function findBestHint(state: GameState): HintMove | null {
     const col = tableau[fromCol];
     const firstFaceUpIdx = col.findIndex(c => c.faceUp);
     if (firstFaceUpIdx === -1) continue;
+    const card = col[firstFaceUpIdx];
+    if (card.rank === 13) continue; 
+    for (let toCol = 0; toCol < tableau.length; toCol++) {
+      if (toCol === fromCol) continue;
+      if (canMoveToTableau(card, tableau[toCol])) {
+        return {
+          cardId: card.id,
+          fromPile: { type: 'tableau', index: fromCol },
+          toPile: { type: 'tableau', index: toCol },
+          description: `Move ${rankLabel(card.rank)}${suitSymbol(card.suit)} in Tableau`,
+        };
+      }
+    }
+  }
+
+  const hasEmptyCol = tableau.some(col => col.length === 0);
+  if (hasEmptyCol) {
+
+    if (waste.length > 0 && waste[waste.length - 1].rank === 13) {
+      const card = waste[waste.length - 1];
+      const emptyColIdx = tableau.findIndex(col => col.length === 0);
+      return {
+        cardId: card.id,
+        fromPile: { type: 'waste' },
+        toPile: { type: 'tableau', index: emptyColIdx },
+        description: `Move King to empty column`,
+      };
+    }
+
+    for (let fromCol = 0; fromCol < tableau.length; fromCol++) {
+      const col = tableau[fromCol];
+      const firstFaceUpIdx = col.findIndex(c => c.faceUp);
+      if (firstFaceUpIdx === -1) continue;
+      const card = col[firstFaceUpIdx];
+      if (card.rank !== 13) continue;
+
+      const emptyColIdx = tableau.findIndex((c, i) => c.length === 0 && i !== fromCol);
+      if (emptyColIdx === -1) continue;
+      return {
+        cardId: card.id,

@@ -638,3 +638,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         cardsToMove = [{ ...card, faceUp: true }];
         newState.waste = state.waste.slice(0, -1);
         scoreChange += POINTS.WASTE_TO_TABLEAU;
+        } else if (fromPile.type === 'tableau') {
+        const colIdx = fromPile.index!;
+        const col = state.tableau[colIdx];
+        const cardIdx = col.findIndex(c => c.id === cardId);
+        if (cardIdx === -1) return state;
+        card = col[cardIdx];
+        if (!card.faceUp) return state;
+        cardsToMove = getMovableSequence(col, cardIdx).map(c => ({ ...c, faceUp: true }));
+        const newCol = col.slice(0, cardIdx);
+        if (newCol.length > 0 && !newCol[newCol.length - 1].faceUp) {
+          newCol[newCol.length - 1] = { ...newCol[newCol.length - 1], faceUp: true };
+          scoreChange += POINTS.TABLEAU_FLIP;
+        }
+        const newTab = [...state.tableau];
+        newTab[colIdx] = newCol;
+        newState.tableau = newTab;
+      } else if (fromPile.type === 'foundation') {
+        const fIdx = fromPile.index!;
+        const foundation = state.foundations[fIdx];
+        if (foundation.length === 0) return state;
+        card = foundation[foundation.length - 1];
+        if (card.id !== cardId) return state;
+        cardsToMove = [{ ...card, faceUp: true }];
+        const newFoundations = state.foundations.map((f, i) =>
+          i === fIdx ? f.slice(0, -1) : f
+        ) as GameState['foundations'];
+        newState.foundations = newFoundations;
+        scoreChange += POINTS.FOUNDATION_TO_TABLEAU;
+      } else return state;
+
+      if (!card || cardsToMove.length === 0) return state;
+
+      if (toPile.type === 'tableau') {
+        const toColIdx = toPile.index!;
+        const targetCol = newState.tableau[toColIdx];
+        if (!canMoveToTableau(cardsToMove[0], targetCol)) return state;
+        const newTab = [...newState.tableau];
+        newTab[toColIdx] = [...targetCol, ...cardsToMove];
+        newState.tableau = newTab;
+      } else if (toPile.type === 'foundation') {

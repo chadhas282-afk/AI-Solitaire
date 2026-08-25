@@ -1678,3 +1678,43 @@ export function Dashboard() {
           <span className="text-red-400">🚫</span>
           <span className="text-red-300/80 font-medium">No more moves — game over!</span>
           <button onClick={handleNewGame}
+          className="ml-auto text-red-300 hover:text-red-200 font-semibold underline transition-colors">New Game</button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes comboPulse {
+          0%   { transform: scale(1.4); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function StatChip({ label, value, glowColor, mono }: {
+  label: string; value: string; glowColor: string; mono?: boolean;
+}) {
+  const glowMap: Record<string, string> = {
+    emerald: '#10b981', blue: '#60a5fa', violet: '#8b5cf6',
+  };
+  return (
+    <div className="flex flex-col items-center px-1">
+      <span className="text-[9px] uppercase tracking-widest font-medium text-white/30">{label}</span>
+      <span className={`text-white font-display font-bold text-sm sm:text-[15px] leading-tight ${mono ? 'tabular-nums' : ''}`}
+        style={{ textShadow: `0 0 12px ${glowMap[glowColor]}40` }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function ActionBtn({
+  onClick, disabled, title, icon, label, variant, pulse
+}: {
+  onClick: () => void; disabled?: boolean; title: string;
+  icon: string; label: string; variant: 'ghost' | 'amber' | 'emerald'; pulse?: boolean;
+}) {
+  const base = 'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-display font-semibold transition-all duration-200 active:scale-95 border focus:outline-none';
+  const styles = {
+    ghost: `bg-white/8 hover:bg-white/12 text-white/60 hover:text-white/80 border-white/8`,

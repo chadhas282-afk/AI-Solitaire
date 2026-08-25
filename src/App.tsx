@@ -1358,3 +1358,43 @@ function FoundationPile({ index }: { index: number }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `foundation::${index}`,
     data: { pileRef: { type: 'foundation', index } },
+     });
+
+  const topCard = foundation.length > 0 ? foundation[foundation.length - 1] : null;
+  const isComplete = foundation.length === 13;
+  const isHintTarget = state.hint?.toPile.type === 'foundation' && state.hint?.toPile.index === index;
+  const glow = FOUNDATION_GLOW[suit];
+
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div
+        ref={(el) => {
+          setNodeRef(el);
+          (pileRef as any).current = el;
+        }}
+        className={`
+          relative rounded-xl transition-all duration-200
+          w-[4.2rem] h-[5.8rem] sm:w-[4.8rem] sm:h-[6.8rem] lg:w-[5.2rem] lg:h-[7.2rem]
+          ${isHintTarget ? 'hint-target' : ''}
+        `}
+        style={{
+          boxShadow: isOver ? `0 0 20px ${glow}, 0 0 8px ${glow}` :
+                     isComplete ? `0 0 16px ${glow}` : 'none',
+          transition: 'box-shadow 0.3s ease',
+        }}
+      >
+        {topCard ? (
+          <CardComponent
+            card={{ ...topCard, faceUp: true }}
+            fromPile={{ type: 'foundation', index }}
+            isTop
+          />
+        ) : (
+          <EmptyPile pileRef={{ type: 'foundation', index }} suit={suit} />
+        )}
+
+        {isComplete && (
+          <div className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent"
+              style={{ animation: 'shimmer 2s ease-in-out infinite' }} />
+          </div>

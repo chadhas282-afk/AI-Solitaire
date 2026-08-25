@@ -438,3 +438,43 @@ export function findBestHint(state: GameState): HintMove | null {
       if (emptyColIdx === -1) continue;
       return {
         cardId: card.id,
+        fromPile: { type: 'tableau', index: fromCol },
+        toPile: { type: 'tableau', index: emptyColIdx },
+        description: `Move King to empty column`,
+      };
+    }
+  }
+
+  if (stock.length > 0) {
+    return {
+      cardId: '',
+      fromPile: { type: 'stock' },
+      toPile: { type: 'waste' },
+      description: 'Draw from Stock',
+      isDrawAction: true,
+    };
+  }
+
+  if (waste.length > 0 && stock.length === 0) {
+    return {
+      cardId: '',
+      fromPile: { type: 'stock' },
+      toPile: { type: 'waste' },
+      description: 'Recycle Waste pile',
+      isDrawAction: true,
+    };
+  }
+
+  return null; 
+}
+
+export function findAutoCompleteMove(state: GameState): { cardId: string; fromPile: PileRef; foundationIndex: number } | null {
+  const { waste, foundations, tableau } = state;
+
+  if (waste.length > 0) {
+    const card = waste[waste.length - 1];
+    for (let fi = 0; fi < foundations.length; fi++) {
+      if (canMoveToFoundation(card, foundations[fi])) {
+        return { cardId: card.id, fromPile: { type: 'waste' }, foundationIndex: fi };
+      }
+    }

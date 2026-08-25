@@ -1318,3 +1318,43 @@ export function WastePile() {
               <CardComponent
                 card={card}
                 fromPile={{ type: 'waste' }}
+                cardIndex={i}
+                isTop={isTop}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <span className="text-[9px] text-white/25 uppercase tracking-widest font-medium">
+        Waste ({waste.length})
+      </span>
+    </div>
+  );
+}
+
+const FOUNDATION_GLOW: Record<string, string> = {
+  spades:   'rgba(139,92,246,0.4)',
+  hearts:   'rgba(239,68,68,0.4)',
+  diamonds: 'rgba(249,115,22,0.4)',
+  clubs:    'rgba(34,197,94,0.4)',
+};
+
+export function FoundationPiles() {
+  return (
+    <div className="flex gap-1.5 sm:gap-2">
+      {SUIT_ORDER.map((suit, index) => (
+        <FoundationPile key={suit} index={index} />
+      ))}
+    </div>
+  );
+}
+
+function FoundationPile({ index }: { index: number }) {
+  const { state } = useGame();
+  const foundation = state.foundations[index];
+  const suit = SUIT_ORDER[index];
+  const pileRef = useRef<HTMLDivElement>(null);
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: `foundation::${index}`,
+    data: { pileRef: { type: 'foundation', index } },

@@ -1398,3 +1398,44 @@ function FoundationPile({ index }: { index: number }) {
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent"
               style={{ animation: 'shimmer 2s ease-in-out infinite' }} />
           </div>
+            )}
+
+        {foundation.length > 0 && (
+          <div className="absolute -top-1.5 -right-1.5 text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center z-10 shadow"
+            style={{
+              background: isComplete ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'rgba(16,185,129,0.9)',
+              color: 'white',
+            }}>
+            {isComplete ? '✓' : foundation.length}
+          </div>
+        )}
+      </div>
+      <span className={`text-[9px] uppercase tracking-widest font-medium
+        ${SUIT_COLORS[suit] === 'red' ? 'text-red-400/50' : 'text-white/25'}`}>
+        {SUIT_SYMBOLS[suit]}
+      </span>
+    </div>
+  );
+}
+
+const FACE_DOWN_OFFSET = 18;
+const FACE_UP_OFFSET = 28;
+
+export function TableauPiles() {
+  const { state } = useGame();
+  return (
+    <div className="flex gap-1.5 sm:gap-2 lg:gap-2.5 items-start justify-center">
+      {state.tableau.map((_, colIndex) => (
+        <TableauColumn key={colIndex} colIndex={colIndex} />
+      ))}
+    </div>
+  );
+}
+
+function TableauColumn({ colIndex }: { colIndex: number }) {
+  const { state } = useGame();
+  const column = state.tableau[colIndex];
+  const pileRef: PileRef = { type: 'tableau', index: colIndex };
+
+  const faceDownCount = column.filter(c => !c.faceUp).length;
+  const faceUpCount = column.filter(c => c.faceUp).length;

@@ -1198,3 +1198,43 @@ export function StockPile() {
             style={{
               inset: 0,
               transform: 'translate(-4px, -4px)',
+              background: 'linear-gradient(135deg, #1e3a5f, #0f2847)',
+              border: '1px solid rgba(96,165,250,0.1)',
+              zIndex: 0,
+            }} />
+        )}
+        {!isEmpty && stackDepth >= 2 && (
+          <div className="absolute rounded-xl"
+            style={{
+              inset: 0,
+              transform: 'translate(-2px, -2px)',
+              background: 'linear-gradient(135deg, #1e3a5f, #0f2847)',
+              border: '1px solid rgba(96,165,250,0.15)',
+              zIndex: 1,
+            }} />
+        )}
+
+        <div
+          className={`
+            relative rounded-xl overflow-hidden
+            w-[4.2rem] h-[5.8rem] sm:w-[4.8rem] sm:h-[6.8rem] lg:w-[5.2rem] lg:h-[7.2rem]
+            transition-all duration-200 active:scale-95 cursor-pointer
+          `}
+          style={{
+            zIndex: 2,
+            boxShadow: isEmpty
+              ? 'inset 0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)'
+              : '0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)',
+          }}
+        >
+          {isEmpty ? (
+
+            <div className="inset-0 absolute flex flex-col items-center justify-center gap-1.5 rounded-xl"
+              style={{
+                background: 'rgba(0,0,0,0.2)',
+                border: '2px dashed rgba(255,255,255,0.12)',
+              }}>
+              <svg className="w-7 h-7 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>

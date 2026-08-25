@@ -1558,3 +1558,43 @@ export function Dashboard() {
   };
 
   const handleAutoComplete = () => {
+     dispatch({ type: 'AUTO_COMPLETE_STEP' });
+  };
+
+  const handleNewGame = () => {
+    dispatch({ type: 'NEW_GAME' });
+  };
+
+  const handleUndo = () => {
+    if (state.history.length === 0) return;
+    dispatch({ type: 'UNDO' });
+  };
+
+  const handleToggleDraw = () => {
+    dispatch({ type: 'TOGGLE_DRAW_COUNT' });
+  };
+
+  const canUndo = state.history.length > 0;
+  const hint = state.hint;
+
+  return (
+    <div className="w-full">
+
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
+
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-xl shadow-lg shadow-emerald-500/30 object-cover border border-white/10" />
+          <div className="hidden sm:block">
+            <div className="font-display font-bold text-white text-base leading-none tracking-tight">AI Solitaire</div>
+            <div className="text-white/30 text-[10px] leading-none mt-0.5 tracking-widest uppercase">Classic</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 sm:gap-3">
+          <StatChip label="Score" value={state.score.toLocaleString()} glowColor="emerald" />
+          <div className="w-px h-6 bg-white/10" />
+          <StatChip label="Moves" value={state.moves.toString()} glowColor="blue" />
+          <div className="w-px h-6 bg-white/10" />
+          <StatChip label="Time" value={formatTime(state.elapsedTime)} glowColor="violet" mono />
+
+          {state.combo >= 2 && (

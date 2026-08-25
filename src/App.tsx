@@ -1718,3 +1718,43 @@ function ActionBtn({
   const base = 'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-display font-semibold transition-all duration-200 active:scale-95 border focus:outline-none';
   const styles = {
     ghost: `bg-white/8 hover:bg-white/12 text-white/60 hover:text-white/80 border-white/8`,
+     amber: `bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/25 shadow-sm shadow-amber-500/10`,
+    emerald: `bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/25 shadow-sm shadow-emerald-500/10`,
+  };
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`${base} ${styles[variant]} ${disabled ? 'opacity-30 cursor-not-allowed' : ''} ${pulse ? 'animate-pulse' : ''}`}
+    >
+      <span className="text-sm">{icon}</span>
+      <span className="hidden sm:inline">{label}</span>
+    </button>
+  );
+}
+
+export function Board() {
+  const { state, dispatch } = useGame();
+  const [draggingCard, setDraggingCard] = useState<Card | null>(null);
+  const [draggingFrom, setDraggingFrom] = useState<PileRef | null>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { data } = event.active;
+    if (data.current) {
+      setDraggingCard(data.current.card as Card);
+      setDraggingFrom(data.current.fromPile as PileRef);
+    }
+    dispatch({ type: 'CLEAR_HINT' });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setDraggingCard(null);
+    setDraggingFrom(null);
+    const { active, over } = event;

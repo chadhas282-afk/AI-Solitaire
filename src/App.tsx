@@ -758,3 +758,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         foundationCount,
         lastAction: 'Foundation move',
       };
+      return checkGameStatus(newState);
+    }
+
+    case 'DOUBLE_CLICK_CARD': {
+      const { cardId, fromPile } = action;
+      for (let fi = 0; fi < state.foundations.length; fi++) {
+        const f = state.foundations[fi];
+        let card: Card | undefined;
+        if (fromPile.type === 'waste') {
+          card = state.waste[state.waste.length - 1];
+          if (!card || card.id !== cardId) continue;
+        } else if (fromPile.type === 'tableau') {
+          const col = state.tableau[fromPile.index!];
+          card = col[col.length - 1];
+          if (!card || card.id !== cardId || !card.faceUp) continue;
+        } else continue;
+        if (canMoveToFoundation(card, f)) {
+          return gameReducer(state, { type: 'MOVE_TO_FOUNDATION', cardId, fromPile, foundationIndex: fi });
+        }
+      }
+      for (let ti = 0; ti < state.tableau.length; ti++) {
+        const col = state.tableau[ti];
+        let card: Card | undefined;
+        if (fromPile.type === 'waste') {
+          card = state.waste[state.waste.length - 1];
+          if (!card || card.id !== cardId) continue;
+        } else if (fromPile.type === 'tableau') {
+          if (fromPile.index === ti) continue;
+          const fromCol = state.tableau[fromPile.index!];
+          const cardIdx = fromCol.findIndex(c => c.id === cardId);
+          if (cardIdx === -1) continue;
+          card = fromCol[cardIdx];
+          if (!card.faceUp) continue;
+        } else continue;
+        if (canMoveToTableau(card!, col)) {
+          return gameReducer(state, { type: 'MOVE_CARD', cardId, fromPile, toPile: { type: 'tableau', index: ti } });
+        }
+      }
+      return state;
+    }

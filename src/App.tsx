@@ -1118,3 +1118,43 @@ function PipGrid({ rank, symbol, color }: { rank: number; symbol: string; color:
             }}
           >
             {symbol}
+             </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getPipPositions(rank: number): { x: number; y: number; flip?: boolean }[] {
+  const L = 25, R = 75, C = 50;
+  const T = 15, TM = 35, M = 50, BM = 65, B = 85;
+  switch (rank) {
+    case 1:  return [{ x: C, y: M }];
+    case 2:  return [{ x: C, y: T }, { x: C, y: B, flip: true }];
+    case 3:  return [{ x: C, y: T }, { x: C, y: M }, { x: C, y: B, flip: true }];
+    case 4:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 5:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 6:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 7:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 8:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: C, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 9:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: TM }, { x: R, y: TM }, { x: C, y: M }, { x: L, y: BM, flip: true }, { x: R, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 10: return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM - 5 }, { x: L, y: TM }, { x: R, y: TM }, { x: L, y: BM, flip: true }, { x: R, y: BM, flip: true }, { x: C, y: BM + 5, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    default: return [];
+  }
+}
+
+export function CardDragOverlay({ card }: { card: Card }) {
+  const styles = SUIT_CARD_STYLE[card.suit];
+  const rankLabel = RANK_LABELS[card.rank];
+  const suitSymbol = SUIT_SYMBOLS[card.suit];
+
+  return (
+    <div
+      className="relative rounded-xl no-select select-none overflow-hidden rotate-2 scale-110"
+      style={{
+        width: '4.8rem', height: '6.8rem',
+        background: `linear-gradient(145deg, #fffef7 0%, ${styles.accent} 100%)`,
+        boxShadow: `0 20px 50px rgba(0,0,0,0.5), 0 8px 20px ${styles.shadow}`,
+        border: '1px solid rgba(209,213,219,0.8)',
+      }}
+    ></div>

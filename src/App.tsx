@@ -678,3 +678,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         newTab[toColIdx] = [...targetCol, ...cardsToMove];
         newState.tableau = newTab;
       } else if (toPile.type === 'foundation') {
+        const toFIdx = toPile.index!;
+        if (cardsToMove.length !== 1) return state;
+        if (!canMoveToFoundation(cardsToMove[0], newState.foundations[toFIdx])) return state;
+        const newFoundations = newState.foundations.map((f, i) =>
+          i === toFIdx ? [...f, cardsToMove[0]] : f
+        ) as GameState['foundations'];
+        newState.foundations = newFoundations;
+        scoreChange += POINTS.TO_FOUNDATION;
+      } else return state;
+
+      newState = {
+        ...newState, history,
+        score: Math.max(0, state.score + scoreChange),
+        moves: state.moves + 1, hint: null, combo: 0, lastAction: 'Moved card',
+      };
+      return checkGameStatus(newState);
+    }
+
+    case 'MOVE_TO_FOUNDATION': {
+      const { cardId, fromPile, foundationIndex, particlePos } = action;
+      const history = pushHistory(state);
+      let newState = { ...state };
+      let scoreChange = POINTS.TO_FOUNDATION;
+      let card: Card | null = null;
+
+      if (fromPile.type === 'waste') {
+        const idx = state.waste.findIndex(c => c.id === cardId);
+        if (idx === -1 || idx !== state.waste.length - 1) return state;
+        card = state.waste[idx];
+        newState.waste = state.waste.slice(0, -1);
+      } else if (fromPile.type === 'tableau') {
+        const colIdx = fromPile.index!;
+        const col = state.tableau[colIdx];
+        const cardIdx = col.findIndex(c => c.id === cardId);
+        if (cardIdx === -1 || cardIdx !== col.length - 1) return state;
+        card = col[cardIdx];
+        if (!card.faceUp) return state;
+        const newCol = col.slice(0, -1);
+        if (newCol.length > 0 && !newCol[newCol.length - 1].faceUp) {
+          newCol[newCol.length - 1] = { ...newCol[newCol.length - 1], faceUp: true };

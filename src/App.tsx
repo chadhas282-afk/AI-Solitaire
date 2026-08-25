@@ -558,3 +558,43 @@ function getComboMessage(combo: number): string | null {
   if (combo === 2) return '2x Combo! 🔥';
   if (combo === 3) return '3x Combo! 🔥🔥';
   if (combo === 4) return '4x Combo! 💥';
+   if (combo === 5) return '5x Blazing! 🌟';
+  if (combo >= 6) return `${combo}x UNSTOPPABLE! ⚡`;
+  return null;
+}
+
+function pushHistory(state: GameState): GameState['history'] {
+  const snap = snapshotState(state);
+  const history = [...state.history, snap];
+  if (history.length > MAX_HISTORY) history.shift();
+  return history;
+}
+
+export function gameReducer(state: GameState, action: GameAction): GameState {
+  switch (action.type) {
+
+    case 'NEW_GAME':
+      return createInitialState(action.drawCount ?? state.drawCount);
+
+    case 'TOGGLE_DRAW_COUNT': {
+      const newDrawCount: DrawCount = state.drawCount === 1 ? 3 : 1;
+      return createInitialState(newDrawCount);
+    }
+
+    case 'TICK_TIMER':
+      if (!state.timerActive || state.won || state.gameOver) return state;
+      return { ...state, elapsedTime: state.elapsedTime + 1 };
+
+    case 'CLEAR_HINT':
+      return { ...state, hint: null };
+
+    case 'CLEAR_PARTICLES':
+      return { ...state, particleEvents: [] };
+
+    case 'CLEAR_TOAST':
+      return { ...state, toastMessage: null };
+
+    case 'HINT':
+      return { ...state, hint: findBestHint(state) };
+
+    case 'DRAW_CARD': {

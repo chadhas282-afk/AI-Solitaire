@@ -1638,3 +1638,43 @@ export function Dashboard() {
             <ActionBtn
               onClick={handleAutoComplete}
               title="Auto-Finish"
+              icon="⚡"
+              label="Finish"
+              variant="emerald"
+              pulse
+            />
+          )}
+          <ActionBtn
+            onClick={handleNewGame}
+            title="New Game"
+            icon="🔄"
+            label="New"
+            variant="ghost"
+          />
+        </div>
+      </div>
+
+      <div className="h-0.5 w-full bg-white/5">
+        <div
+          className="h-full transition-all duration-500 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: `linear-gradient(90deg, #10b981, #06b6d4, #8b5cf6)`,
+            boxShadow: progress > 0 ? '0 0 8px rgba(16,185,129,0.6)' : 'none',
+          }}
+        />
+      </div>
+
+      {state.isAutoCompleting && (
+        <div className="mx-3 my-1.5 px-3 py-2 rounded-xl border flex items-center gap-2 text-xs"
+          style={{ background: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.2)' }}>
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-emerald-300/80 font-medium">Auto-completing the game…</span>
+        </div>
+      )}
+      {state.gameOver && !state.won && (
+        <div className="mx-3 my-1.5 px-3 py-2 rounded-xl border flex items-center gap-2 text-xs"
+          style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.2)' }}>
+          <span className="text-red-400">🚫</span>
+          <span className="text-red-300/80 font-medium">No more moves — game over!</span>
+          <button onClick={handleNewGame}

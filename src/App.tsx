@@ -1758,3 +1758,43 @@ export function Board() {
     setDraggingCard(null);
     setDraggingFrom(null);
     const { active, over } = event;
+     if (!over || !active.data.current) return;
+
+    const card = active.data.current.card as Card;
+    const fromPile = active.data.current.fromPile as PileRef;
+    const overId = String(over.id);
+
+    const rect = over.rect;
+    const particlePos = rect
+      ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+      : undefined;
+
+    if (overId.startsWith('foundation::')) {
+      const fi = parseInt(overId.split('::')[1]);
+      dispatch({ type: 'MOVE_TO_FOUNDATION', cardId: card.id, fromPile, foundationIndex: fi, particlePos });
+      return;
+    }
+    if (overId.startsWith('tableau::')) {
+      const ci = parseInt(overId.split('::')[1]);
+      dispatch({ type: 'MOVE_CARD', cardId: card.id, fromPile, toPile: { type: 'tableau', index: ci } });
+      return;
+    }
+    if (overId.startsWith('empty::')) {
+      const parts = overId.split('::');
+      const pileType = parts[1] as PileRef['type'];
+      const pileIndex = parts[2] !== 'x' ? parseInt(parts[2]) : undefined;
+      if (pileType === 'foundation' && pileIndex !== undefined) {
+        dispatch({ type: 'MOVE_TO_FOUNDATION', cardId: card.id, fromPile, foundationIndex: pileIndex, particlePos });
+      } else if (pileType === 'tableau' && pileIndex !== undefined) {
+        dispatch({ type: 'MOVE_CARD', cardId: card.id, fromPile, toPile: { type: 'tableau', index: pileIndex } });
+      }
+      return;
+    }
+
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}

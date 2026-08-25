@@ -1439,3 +1439,42 @@ function TableauColumn({ colIndex }: { colIndex: number }) {
 
   const faceDownCount = column.filter(c => !c.faceUp).length;
   const faceUpCount = column.filter(c => c.faceUp).length;
+   const cardHeightPx = 92; 
+  const columnHeight =
+    faceDownCount * FACE_DOWN_OFFSET +
+    faceUpCount * FACE_UP_OFFSET +
+    cardHeightPx + 16;
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: `tableau::${colIndex}`,
+    data: { pileRef },
+  });
+
+  const isHintTarget = state.hint?.toPile.type === 'tableau' && state.hint?.toPile.index === colIndex;
+
+  if (column.length === 0) {
+    return (
+      <div
+        ref={setNodeRef}
+        className={`rounded-xl transition-all duration-200
+          ${isHintTarget ? 'ring-2 ring-emerald-400/40' : ''}
+          ${isOver ? 'ring-2 ring-white/20' : ''}
+        `}
+      >
+        <EmptyPile pileRef={pileRef} label="K" />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`
+        relative
+        w-[4.2rem] sm:w-[4.8rem] lg:w-[5.2rem]
+        rounded-xl transition-all duration-200
+        ${isOver ? 'ring-1 ring-white/15' : ''}
+        ${isHintTarget ? 'ring-2 ring-emerald-400/40' : ''}
+      `}
+      style={{ height: `${columnHeight}px`, minHeight: `${cardHeightPx}px` }}
+    >

@@ -518,3 +518,43 @@ export function isDeadEnd(state: GameState): boolean {
   for (const { card } of topCards) {
     for (const f of foundations) {
       if (canMoveToFoundation(card, f)) return false;
+      }
+    for (const col of tableau) {
+      if (canMoveToTableau(card, col)) return false;
+    }
+  }
+
+  if (waste.length > 0) return false;
+
+  return true;
+}
+
+const RANK_MAP: Record<number, string> = {
+  1: 'A', 11: 'J', 12: 'Q', 13: 'K'
+};
+function rankLabel(rank: number): string {
+  return RANK_MAP[rank] ?? String(rank);
+}
+const SUIT_MAP: Record<string, string> = {
+  spades: '♠', hearts: '♥', diamonds: '♦', clubs: '♣'
+};
+function suitSymbol(suit: string): string {
+  return SUIT_MAP[suit] ?? suit;
+}
+
+const POINTS = {
+  TO_FOUNDATION: 10,
+  TABLEAU_FLIP: 5,
+  WASTE_TO_TABLEAU: 5,
+  FOUNDATION_TO_TABLEAU: -15,
+  UNDO: -15,
+  COMBO_BONUS: 25,   
+};
+
+const MAX_HISTORY = 100;
+let particleCounter = 0;
+
+function getComboMessage(combo: number): string | null {
+  if (combo === 2) return '2x Combo! 🔥';
+  if (combo === 3) return '3x Combo! 🔥🔥';
+  if (combo === 4) return '4x Combo! 💥';

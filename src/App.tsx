@@ -1517,3 +1517,44 @@ function formatTime(seconds: number): string {
   const s = seconds % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
+
+export function Dashboard() {
+  const { state, dispatch } = useGame();
+  const [hintLoading, setHintLoading] = useState(false);
+  const prevCombo = useRef(0);
+
+  const progress = (state.foundationCount / 52) * 100;
+
+  useEffect(() => {
+    prevCombo.current = state.combo;
+  }, [state.combo]);
+
+  const handleHint = () => {
+    if (hintLoading || state.won || state.gameOver) return;
+    setHintLoading(true);
+    setTimeout(() => {
+      const hint = findBestHint(state);
+      setHintLoading(false);
+      if (!hint) return;
+
+      if (hint.isDrawAction) {
+        dispatch({ type: 'DRAW_CARD' });
+      } else if (hint.toPile.type === 'foundation' && hint.toPile.index !== undefined) {
+        dispatch({
+          type: 'MOVE_TO_FOUNDATION',
+          cardId: hint.cardId,
+          fromPile: hint.fromPile,
+          foundationIndex: hint.toPile.index,
+        });
+      } else {
+        dispatch({
+          type: 'MOVE_CARD',
+          cardId: hint.cardId,
+          fromPile: hint.fromPile,
+          toPile: hint.toPile,
+        });
+      }
+    }, 200);
+  };
+
+  const handleAutoComplete = () => {

@@ -598,3 +598,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, hint: findBestHint(state) };
 
     case 'DRAW_CARD': {
+      const history = pushHistory(state);
+      let { stock, waste, stockRecycles } = state;
+
+      if (stock.length === 0) {
+        if (waste.length === 0) return state;
+        stock = waste.map(c => ({ ...c, faceUp: false })).reverse();
+        waste = [];
+        stockRecycles++;
+        return {
+          ...state, stock, waste, stockRecycles, history, hint: null,
+          moves: state.moves + 1, combo: 0, lastAction: 'Recycled stock',
+        };
+      }
+
+      const count = Math.min(state.drawCount, stock.length);
+      const drawn = stock.slice(-count).map(c => ({ ...c, faceUp: true })).reverse();
+      const newStock = stock.slice(0, stock.length - count);
+      const newWaste = [...waste, ...drawn.reverse()];
+
+      return checkGameStatus({
+        ...state, stock: newStock, waste: newWaste, history, hint: null,
+        moves: state.moves + 1, combo: 0, lastAction: 'Drew card',
+      });
+    }
+
+    case 'MOVE_CARD': {
+      const { cardId, fromPile, toPile } = action;
+      const history = pushHistory(state);
+      let newState = { ...state };
+      let scoreChange = 0;
+      let card: Card | null = null;
+      let cardsToMove: Card[] = [];
+
+      if (fromPile.type === 'waste') {
+        const idx = state.waste.findIndex(c => c.id === cardId);
+        if (idx === -1 || idx !== state.waste.length - 1) return state;
+        card = state.waste[idx];
+        cardsToMove = [{ ...card, faceUp: true }];
+        newState.waste = state.waste.slice(0, -1);
+        scoreChange += POINTS.WASTE_TO_TABLEAU;

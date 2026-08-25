@@ -878,3 +878,43 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     if (
       action.type !== 'HINT' &&
       action.type !== 'CLEAR_HINT' &&
+      action.type !== 'TICK_TIMER' &&
+      action.type !== 'CLEAR_PARTICLES' &&
+      action.type !== 'CLEAR_TOAST'
+    ) {
+      if (state.hint) dispatch({ type: 'CLEAR_HINT' });
+    }
+    dispatch(action);
+  }, [state.hint]);
+
+  return (
+    <GameContext.Provider value={{ state, dispatch: wrappedDispatch }}>
+      {children}
+    </GameContext.Provider>
+  );
+}
+
+export function useGame() {
+  const ctx = useContext(GameContext);
+  if (!ctx) throw new Error('useGame must be used within a GameProvider');
+  return ctx;
+}
+
+interface EmptyPileProps {
+  pileRef: PileRef;
+  suit?: Suit;
+  label?: string;
+  className?: string;
+}
+
+export function EmptyPile({ pileRef, suit, label, className = '' }: EmptyPileProps) {
+  const { state } = useGame();
+  const droppableId = `empty::${pileRef.type}::${pileRef.index ?? 'x'}`;
+
+  const isHintTarget =
+    state.hint?.toPile.type === pileRef.type &&
+    state.hint?.toPile.index === pileRef.index;
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: droppableId,
+    data: { pileRef },

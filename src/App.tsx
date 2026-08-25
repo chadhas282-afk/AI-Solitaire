@@ -478,3 +478,43 @@ export function findAutoCompleteMove(state: GameState): { cardId: string; fromPi
         return { cardId: card.id, fromPile: { type: 'waste' }, foundationIndex: fi };
       }
     }
+    }
+
+  for (let ti = 0; ti < tableau.length; ti++) {
+    const col = tableau[ti];
+    if (col.length === 0) continue;
+    const card = col[col.length - 1];
+    if (!card.faceUp) continue;
+    for (let fi = 0; fi < foundations.length; fi++) {
+      if (canMoveToFoundation(card, foundations[fi])) {
+        return { cardId: card.id, fromPile: { type: 'tableau', index: ti }, foundationIndex: fi };
+      }
+    }
+  }
+
+  return null;
+}
+
+export function isDeadEnd(state: GameState): boolean {
+  if (state.won) return false;
+  const { stock, waste, foundations, tableau } = state;
+
+  if (stock.length > 0) return false;
+
+  const topCards: { card: typeof waste[0]; pile: PileRef }[] = [];
+
+  if (waste.length > 0) {
+    topCards.push({ card: waste[waste.length - 1], pile: { type: 'waste' } });
+  }
+
+  for (let i = 0; i < tableau.length; i++) {
+    const col = tableau[i];
+    for (let j = col.length - 1; j >= 0; j--) {
+      if (!col[j].faceUp) break;
+      topCards.push({ card: col[j], pile: { type: 'tableau', index: i } });
+    }
+  }
+
+  for (const { card } of topCards) {
+    for (const f of foundations) {
+      if (canMoveToFoundation(card, f)) return false;

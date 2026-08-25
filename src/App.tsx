@@ -1478,3 +1478,42 @@ function TableauColumn({ colIndex }: { colIndex: number }) {
       `}
       style={{ height: `${columnHeight}px`, minHeight: `${cardHeightPx}px` }}
     >
+       {column.map((card, cardIndex) => {
+        const prevFaceDown = column.slice(0, cardIndex).filter(c => !c.faceUp).length;
+        const prevFaceUp = cardIndex - prevFaceDown;
+        const topOffset = prevFaceDown * FACE_DOWN_OFFSET + prevFaceUp * FACE_UP_OFFSET;
+
+        return (
+          <div
+            key={card.id}
+            className="absolute left-0 transition-all duration-200"
+            style={{ top: topOffset, zIndex: cardIndex + 1 }}
+          >
+            <CardComponent
+              card={card}
+              fromPile={pileRef}
+              cardIndex={cardIndex}
+              isTop={cardIndex === column.length - 1}
+            />
+          </div>
+        );
+      })}
+
+      {isOver && (
+        <div
+          className="absolute bottom-0 left-0 right-0 h-10 rounded-b-xl"
+          style={{
+            background: 'linear-gradient(to top, rgba(255,255,255,0.08), transparent)',
+            zIndex: column.length + 1,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}

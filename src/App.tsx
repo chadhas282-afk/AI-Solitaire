@@ -1157,4 +1157,44 @@ export function CardDragOverlay({ card }: { card: Card }) {
         boxShadow: `0 20px 50px rgba(0,0,0,0.5), 0 8px 20px ${styles.shadow}`,
         border: '1px solid rgba(209,213,219,0.8)',
       }}
-    ></div>
+    >
+      <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none" style={{ color: styles.text }}>
+        <span className="text-[15px] font-black font-display leading-none">{rankLabel}</span>
+        <span className="text-xs leading-none">{suitSymbol}</span>
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-4xl select-none" style={{ color: styles.text, opacity: 0.7 }}>{suitSymbol}</span>
+      </div>
+      <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180" style={{ color: styles.text }}>
+        <span className="text-[15px] font-black font-display leading-none">{rankLabel}</span>
+        <span className="text-xs leading-none">{suitSymbol}</span>
+      </div>
+      <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/50 to-transparent rounded-t-xl pointer-events-none" />
+    </div>
+  );
+}
+
+export function StockPile() {
+  const { state, dispatch } = useGame();
+  const isEmpty = state.stock.length === 0;
+
+  const handleClick = () => {
+    dispatch({ type: 'DRAW_CARD' });
+  };
+
+  const stackDepth = Math.min(state.stock.length, 4);
+
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <button
+        onClick={handleClick}
+        className="relative focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xl"
+        title={isEmpty ? 'Recycle waste' : `Draw ${state.drawCount} card(s)`}
+        aria-label={isEmpty ? 'Recycle waste' : 'Draw from stock'}
+      >
+
+        {!isEmpty && stackDepth >= 3 && (
+          <div className="absolute rounded-xl"
+            style={{
+              inset: 0,
+              transform: 'translate(-4px, -4px)',

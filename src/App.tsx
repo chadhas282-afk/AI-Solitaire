@@ -998,3 +998,43 @@ export function CardComponent({
         ref={setNodeRef}
         style={{
           ...style,
+           ...dragStyle,
+          boxShadow: '0 3px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3)',
+        }}
+        className={`
+          relative rounded-xl no-select
+          w-[4.2rem] h-[5.8rem] sm:w-[4.8rem] sm:h-[6.8rem] lg:w-[5.2rem] lg:h-[7.2rem]
+          overflow-hidden
+          ${isDragging ? 'opacity-0' : ''}
+          transition-shadow duration-150
+        `}
+        {...attributes}
+        {...listeners}
+
+      >
+
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2847 50%, #1a3560 100%)',
+        }} />
+
+        <div className="absolute inset-[3px] rounded-lg border border-blue-400/20" />
+
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `repeating-linear-gradient(45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px),
+                            repeating-linear-gradient(-45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px)`,
+        }} />
+
+        {['tl','tr','bl','br'].map(pos => (
+          <div key={pos} className={`absolute w-1.5 h-1.5 rounded-full bg-blue-300/30
+            ${pos.includes('t') ? 'top-2' : 'bottom-2'}
+            ${pos.includes('l') ? 'left-2' : 'right-2'}`} />
+        ))}
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-blue-300/15 text-3xl select-none font-bold">♦</span>
+        </div>
+
+        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/8 to-transparent rounded-t-xl pointer-events-none" />
+      </div>
+    );
+  }

@@ -798,3 +798,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       }
       return state;
     }
+
+    case 'UNDO': {
+      if (state.history.length === 0) return state;
+      const history = [...state.history];
+      const snap = history.pop()!;
+      return {
+        ...state,
+        stock: snap.stock, waste: snap.waste,
+        foundations: snap.foundations, tableau: snap.tableau,
+        score: Math.max(0, snap.score + POINTS.UNDO),
+        moves: snap.moves, history, hint: null,
+        won: false, gameOver: false, isAutoCompleting: false,
+        combo: 0, toastMessage: '↩ Undo (-15pts)', toastKey: state.toastKey + 1,
+        lastAction: 'Undo',
+        autoCompleteAvailable: canAutoComplete({ ...state, tableau: snap.tableau }),
+      };
+    }
+
+    case 'AUTO_COMPLETE_STEP': {
+      const move = findAutoCompleteMove(state);
+      if (!move) {
+        if (isWon(state)) return { ...state, won: true, timerActive: false, isAutoCompleting: false };
+        return { ...state, isAutoCompleting: false };
+      }
+      return gameReducer({ ...state, isAutoCompleting: true }, {
+        type: 'MOVE_TO_FOUNDATION',
+        cardId: move.cardId,
+        fromPile: move.fromPile,
+        foundationIndex: move.foundationIndex,
+      });
+    }
+
+    default:
+      return state;
+  }
+}
+
+function checkGameStatus(state: GameState): GameState {
+  const won = isWon(state);
+  const autoCompleteAvailable = !won && canAutoComplete(state);

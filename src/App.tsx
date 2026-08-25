@@ -958,3 +958,43 @@ const SUIT_CARD_STYLE: Record<string, { text: string; shadow: string; accent: st
 
 interface CardProps {
   card: Card;
+  fromPile: PileRef;
+  cardIndex?: number;
+  style?: React.CSSProperties;
+  isTop?: boolean;
+  isDragOverlay?: boolean;
+}
+
+export function CardComponent({
+  card, fromPile, cardIndex = 0, style, isTop = false, isDragOverlay = false,
+}: CardProps) {
+  const { state, dispatch } = useGame();
+  const draggableId = `${card.id}::${fromPile.type}::${fromPile.index ?? 'x'}`;
+
+  const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({
+    id: draggableId,
+    disabled: !card.faceUp || isDragOverlay,
+    data: { card, fromPile, cardIndex },
+  });
+
+  const isHintSource = state.hint?.cardId === card.id;
+  const isRed = SUIT_COLORS[card.suit] === 'red';
+  const styles = SUIT_CARD_STYLE[card.suit];
+
+  const dragStyle: React.CSSProperties = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    : {};
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!card.faceUp) return;
+    dispatch({ type: 'DOUBLE_CLICK_CARD', cardId: card.id, fromPile });
+  };
+
+  if (!card.faceUp) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,

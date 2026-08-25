@@ -918,3 +918,43 @@ export function EmptyPile({ pileRef, suit, label, className = '' }: EmptyPilePro
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId,
     data: { pileRef },
+    });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`
+        w-[4.2rem] h-[5.8rem] sm:w-[4.8rem] sm:h-[6.8rem] lg:w-[5.2rem] lg:h-[7.2rem]
+        rounded-xl flex items-center justify-center
+        transition-all duration-200
+        ${isHintTarget ? 'hint-target' : ''}
+        ${className}
+      `}
+      style={{
+        border: isOver
+          ? '2px solid rgba(255,255,255,0.35)'
+          : '2px dashed rgba(255,255,255,0.12)',
+        background: isOver ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
+        boxShadow: isOver ? 'inset 0 0 20px rgba(255,255,255,0.05)' : 'none',
+      }}
+    >
+      {suit ? (
+        <span className="text-2xl sm:text-3xl text-white/15 select-none">{SUIT_SYMBOLS[suit]}</span>
+      ) : label ? (
+        <span className="text-sm sm:text-base font-display font-bold text-white/10 select-none">{label}</span>
+      ) : (
+        <span className="text-white/10 select-none text-2xl">◇</span>
+      )}
+    </div>
+  );
+}
+
+const SUIT_CARD_STYLE: Record<string, { text: string; shadow: string; accent: string }> = {
+  hearts:   { text: '#dc2626', shadow: 'rgba(220,38,38,0.15)',   accent: '#fef2f2' },
+  diamonds: { text: '#c2410c', shadow: 'rgba(194,65,12,0.15)',   accent: '#fff7ed' },
+  spades:   { text: '#1e293b', shadow: 'rgba(30,41,59,0.15)',    accent: '#f8fafc' },
+  clubs:    { text: '#14532d', shadow: 'rgba(20,83,45,0.15)',    accent: '#f0fdf4' },
+};
+
+interface CardProps {
+  card: Card;

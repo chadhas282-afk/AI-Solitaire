@@ -1277,4 +1277,44 @@ export function WastePile() {
 
   if (waste.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-1.5"></div>
+      <div className="flex flex-col items-center gap-1.5">
+        <EmptyPile pileRef={{ type: 'waste' }} label="Waste" />
+        <span className="text-[9px] text-white/25 uppercase tracking-widest font-medium">Waste</span>
+      </div>
+    );
+  }
+
+  const fanCards = drawCount === 3
+    ? waste.slice(Math.max(0, waste.length - 3))
+    : waste.slice(-1);
+
+  const fanOffset = 18; 
+
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div
+        ref={setNodeRef}
+        className={`
+          relative
+          h-[5.8rem] sm:h-[6.8rem] lg:h-[7.2rem]
+          transition-all duration-200
+          ${isOver ? 'ring-1 ring-white/20 rounded-xl' : ''}
+        `}
+        style={{
+          width: drawCount === 3
+            ? `calc(4.2rem + ${(fanCards.length - 1) * fanOffset}px)`
+            : '4.2rem',
+        }}
+      >
+        {fanCards.map((card, i) => {
+          const isTop = i === fanCards.length - 1;
+          const offsetX = drawCount === 3 ? i * fanOffset : 0;
+          return (
+            <div
+              key={card.id}
+              className="absolute top-0"
+              style={{ left: offsetX, zIndex: i + 1 }}
+            >
+              <CardComponent
+                card={card}
+                fromPile={{ type: 'waste' }}

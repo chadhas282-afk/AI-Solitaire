@@ -1598,3 +1598,43 @@ export function Dashboard() {
           <StatChip label="Time" value={formatTime(state.elapsedTime)} glowColor="violet" mono />
 
           {state.combo >= 2 && (
+             <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-display font-bold"
+              style={{
+                background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
+                color: 'white',
+                boxShadow: '0 0 12px rgba(245,158,11,0.5)',
+                animation: 'comboPulse 0.5s ease-out',
+              }}>
+              🔥 {state.combo}x
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <ActionBtn
+            onClick={handleToggleDraw}
+            title={`Draw ${state.drawCount === 1 ? '3' : '1'}`}
+            icon="🃏"
+            label={`Draw ${state.drawCount}`}
+            variant="ghost"
+          />
+          <ActionBtn
+            onClick={handleUndo}
+            disabled={!canUndo}
+            title="Undo"
+            icon="↩"
+            label="Undo"
+            variant="ghost"
+          />
+          <ActionBtn
+            onClick={handleHint}
+            disabled={hintLoading || state.won || state.gameOver}
+            title="AI plays the best move"
+            icon="🤖"
+            label={hintLoading ? '…' : 'AI Move'}
+            variant="amber"
+          />
+          {state.autoCompleteAvailable && !state.isAutoCompleting && (
+            <ActionBtn
+              onClick={handleAutoComplete}
+              title="Auto-Finish"

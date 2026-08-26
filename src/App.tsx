@@ -2118,3 +2118,43 @@ export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
           }}
         >
           {p.char}
+           </div>
+      ))}
+    </div>
+  );
+}
+
+interface ToastProps {
+  message: string;
+  toastKey: number;
+}
+
+export function Toast({ message, toastKey }: ToastProps) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!message) return;
+    setVisible(true);
+    const t = setTimeout(() => setVisible(false), 1600);
+    return () => clearTimeout(t);
+  }, [toastKey]);
+
+  if (!visible || !message) return null;
+
+  const isCombo = message.includes('Combo') || message.includes('UNSTOPPABLE') || message.includes('Blazing');
+  const isUndo = message.includes('Undo');
+
+  return (
+    <div
+      className={`
+        fixed top-20 left-1/2 -translate-x-1/2 z-40
+        px-5 py-2.5 rounded-full
+        font-display font-bold text-sm tracking-wide
+        shadow-2xl pointer-events-none
+        transition-all duration-300
+        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
+        ${isCombo
+          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/40'
+          : isUndo
+            ? 'bg-white/10 text-white/70 backdrop-blur-md border border-white/10'
+            : 'bg-emerald-500/90 text-white shadow-emerald-500/40'

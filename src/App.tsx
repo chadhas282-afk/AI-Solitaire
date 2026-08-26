@@ -2038,3 +2038,43 @@ const SUIT_PARTICLE_COLORS: Record<Suit, string[]> = {
   diamonds: ['#fb923c', '#fbbf24', '#f87171', '#e11d48'],
   spades: ['#818cf8', '#a78bfa', '#60a5fa', '#c4b5fd'],
   clubs: ['#34d399', '#4ade80', '#a3e635', '#86efac'],
+  };
+
+export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const colors = SUIT_PARTICLE_COLORS[suit];
+    const count = 18;
+    const symbol = SUIT_SYMBOLS[suit];
+    const emojis = ['✨', '⭐', symbol, '★', '·'];
+
+    const newParticles: Particle[] = Array.from({ length: count }, (_, i) => {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+      const speed = 2 + Math.random() * 4;
+      return {
+        id: i,
+        x: 0, y: 0,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        char: emojis[Math.floor(Math.random() * emojis.length)],
+        size: 10 + Math.random() * 16,
+        opacity: 1,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 20,
+      };
+    });
+    setParticles(newParticles);
+
+    let frame = 0;
+    const maxFrames = 45;
+    let rafId: number;
+
+    const animate = () => {
+      frame++;
+      if (frame >= maxFrames) {
+        setDone(true);
+        return;
+      }

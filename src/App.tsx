@@ -2158,3 +2158,43 @@ export function Toast({ message, toastKey }: ToastProps) {
           : isUndo
             ? 'bg-white/10 text-white/70 backdrop-blur-md border border-white/10'
             : 'bg-emerald-500/90 text-white shadow-emerald-500/40'
+            }
+      `}
+      style={{ animation: visible ? 'toastPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined }}
+    >
+      {message}
+      <style>{`
+        @keyframes toastPop {
+          0% { transform: translateX(-50%) translateY(-8px) scale(0.8); }
+          100% { transform: translateX(-50%) translateY(0) scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function GameScene() {
+  const { state } = useGame();
+  return (
+    <>
+
+      {state.particleEvents.map(evt => (
+        <ParticleBurst
+          key={evt.id}
+          eventId={evt.id}
+          x={evt.x}
+          y={evt.y}
+          suit={evt.suit}
+        />
+      ))}
+
+      {state.toastMessage && (
+        <Toast message={state.toastMessage} toastKey={state.toastKey} />
+      )}
+
+      <WinModal />
+    </>
+  );
+}
+
+export default function App() {

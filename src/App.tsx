@@ -1918,3 +1918,43 @@ export function WinModal() {
           className="rounded-3xl p-8 text-center relative overflow-hidden"
           style={{
             background: 'linear-gradient(145deg, rgba(15,23,42,0.97), rgba(30,41,59,0.97))',
+             border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
+          }}
+        >
+
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: 'radial-gradient(circle at 50% 0%, rgba(16,185,129,0.15), transparent 60%)',
+          }} />
+
+          <div className="text-7xl mb-3" style={{ filter: 'drop-shadow(0 0 20px rgba(245,158,11,0.6))' }}>
+            🏆
+          </div>
+
+          <h2 className="font-display font-black text-white text-3xl mb-1 tracking-tight"
+            style={{ textShadow: '0 0 30px rgba(16,185,129,0.4)' }}>
+            Victory!
+          </h2>
+          <p className="text-white/30 text-xs tracking-widest uppercase mb-4">Game Complete</p>
+
+          <div className="flex items-center justify-center gap-1 mb-5">
+            {[1,2,3].map(n => (
+              <span key={n} className="text-2xl transition-all duration-300"
+                style={{
+                  filter: n <= stars ? 'drop-shadow(0 0 8px rgba(245,158,11,0.8))' : 'none',
+                  opacity: n <= stars ? 1 : 0.2,
+                  transform: n <= stars ? 'scale(1.1)' : 'scale(1)',
+                }}>⭐</span>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {[
+              { label: 'Moves', value: state.moves, icon: '↔' },
+              { label: 'Time', value: formatTimeWin(state.elapsedTime), icon: '⏱' },
+              { label: 'Best Combo', value: `${state.bestCombo}x 🔥`, icon: '' },
+              { label: 'Base Score', value: state.score.toLocaleString(), icon: '🎯' },
+            ].map(s => (
+              <div key={s.label}
+                className="rounded-xl px-3 py-2.5 text-center"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}></div>

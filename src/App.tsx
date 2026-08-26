@@ -2198,3 +2198,43 @@ function GameScene() {
 }
 
 export default function App() {
+  return (
+    <GameProvider>
+
+      <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
+        background: 'linear-gradient(160deg, #0a1628 0%, #0f2a1e 40%, #0a1628 100%)',
+      }}>
+
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="aurora-blob aurora-1" />
+          <div className="aurora-blob aurora-2" />
+          <div className="aurora-blob aurora-3" />
+
+          <div className="absolute inset-0 opacity-[0.015]" style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+            backgroundSize: '40px 40px',
+          }} />
+        </div>
+
+        <header className="sticky top-0 z-20 relative"
+          style={{
+            background: 'rgba(10,22,40,0.85)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          }}>
+          <Dashboard />
+        </header>
+
+        <main className="flex-1 flex flex-col items-center pt-4 sm:pt-6 relative z-10">
+          <div className="w-full max-w-4xl">
+            <Board />
+          </div>
+        </main>
+
+        <footer className="py-2 text-center relative z-10">
+          <p className="text-white/8 text-[9px] uppercase tracking-widest font-display">
+            All AI logic runs locally · No external APIs
+          </p>
+        </footer>

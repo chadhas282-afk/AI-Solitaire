@@ -1798,3 +1798,43 @@ export function Board() {
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div ref={dropZoneRef} className="flex flex-col gap-3 sm:gap-4 w-full">
+
+        <div className="flex items-start justify-between gap-2 px-2 sm:px-4">
+          <div className="flex items-start gap-1.5 sm:gap-2.5">
+            <StockPile />
+            <WastePile />
+          </div>
+          <FoundationPiles />
+        </div>
+
+        <div className="mx-2 sm:mx-4 h-px bg-white/5" />
+
+        <div className="px-2 sm:px-4 pb-8">
+          <TableauPiles />
+        </div>
+      </div>
+
+      <DragOverlay dropAnimation={{ duration: 120, easing: 'ease-out' }}>
+        {draggingCard ? <CardDragOverlay card={draggingCard} /> : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+function formatTimeWin(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+}
+
+interface FallingCard {
+  id: number;
+  x: number;
+  delay: number;
+  duration: number;
+  suit: string;
+  rank: string;
+  red: boolean;

@@ -1838,3 +1838,43 @@ interface FallingCard {
   suit: string;
   rank: string;
   red: boolean;
+  rotation: number;
+  size: number;
+}
+
+const RANKS_LABELS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+
+export function WinModal() {
+  const { state, dispatch } = useGame();
+  const [visible, setVisible] = useState(false);
+  const [fallingCards, setFallingCards] = useState<FallingCard[]>([]);
+  const played = useRef(false);
+
+  useEffect(() => {
+    if (state.won && !played.current) {
+      played.current = true;
+      setVisible(true);
+
+      const cards: FallingCard[] = Array.from({ length: 28 }, (_, i) => {
+        const suitIdx = Math.floor(Math.random() * 4);
+        return {
+          id: i,
+          x: 5 + Math.random() * 90,
+          delay: Math.random() * 2.5,
+          duration: 2.5 + Math.random() * 2,
+          suit: SUIT_SYMBOLS[SUIT_ORDER[suitIdx]],
+          rank: RANKS_LABELS[Math.floor(Math.random() * 13)],
+          red: suitIdx === 1 || suitIdx === 2,
+          rotation: (Math.random() - 0.5) * 30,
+          size: 0.7 + Math.random() * 0.5,
+        };
+      });
+      setFallingCards(cards);
+    }
+    if (!state.won) { played.current = false; setVisible(false); }
+  }, [state.won]);
+
+  if (!visible) return null;
+
+  const timeBonus = state.elapsedTime > 0 ? Math.round(700000 / state.elapsedTime) : 0;
+  const totalScore = state.score + timeBonus;

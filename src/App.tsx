@@ -2078,3 +2078,43 @@ export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
         setDone(true);
         return;
       }
+      const progress = frame / maxFrames;
+      setParticles(prev => prev.map(p => ({
+        ...p,
+        x: p.x + p.vx,
+        y: p.y + p.vy,
+        vy: p.vy + 0.3, 
+        opacity: 1 - progress,
+        rotation: p.rotation + p.rotationSpeed,
+        vx: p.vx * 0.97,
+      })));
+      rafId = requestAnimationFrame(animate);
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [eventId]);
+
+  if (done || particles.length === 0) return null;
+
+  return (
+    <div
+      className="fixed pointer-events-none z-50"
+      style={{ left: x, top: y }}
+    >
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute select-none"
+          style={{
+            left: p.x,
+            top: p.y,
+            color: p.color,
+            fontSize: p.size,
+            opacity: p.opacity,
+            transform: `rotate(${p.rotation}deg)`,
+            textShadow: `0 0 8px ${p.color}`,
+            fontWeight: 'bold',
+            lineHeight: 1,
+          }}
+        >
+          {p.char}

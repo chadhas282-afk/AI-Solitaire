@@ -1957,4 +1957,44 @@ export function WinModal() {
             ].map(s => (
               <div key={s.label}
                 className="rounded-xl px-3 py-2.5 text-center"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}></div>
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div className="text-white/25 text-[9px] uppercase tracking-widest">{s.label}</div>
+                <div className="text-white font-display font-bold text-sm mt-0.5">
+                  {s.icon} {s.value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl px-4 py-3 mb-5 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(90deg, rgba(245,158,11,0.12), rgba(239,68,68,0.12))',
+              border: '1px solid rgba(245,158,11,0.2)',
+            }}>
+            <div className="absolute inset-0" style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)',
+              animation: 'shimmer 2s ease-in-out infinite',
+            }} />
+            <div className="text-amber-300/50 text-[9px] uppercase tracking-widest mb-0.5">Total Score</div>
+            <div className="font-display font-black text-2xl"
+              style={{ background: 'linear-gradient(90deg, #fbbf24, #f87171)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              {totalScore.toLocaleString()}
+            </div>
+            <div className="text-amber-300/40 text-[10px] mt-0.5">+{timeBonus.toLocaleString()} time bonus</div>
+          </div>
+
+          <button
+            onClick={() => { dispatch({ type: 'NEW_GAME' }); }}
+            className="w-full py-3.5 rounded-2xl font-display font-bold text-sm text-white tracking-wide active:scale-98 transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, #10b981, #0891b2)',
+              boxShadow: '0 0 24px rgba(16,185,129,0.35), 0 4px 12px rgba(0,0,0,0.3)',
+            }}
+          >
+            Deal Again 🃏
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes cardRain {

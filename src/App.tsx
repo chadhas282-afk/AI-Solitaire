@@ -1878,3 +1878,43 @@ export function WinModal() {
 
   const timeBonus = state.elapsedTime > 0 ? Math.round(700000 / state.elapsedTime) : 0;
   const totalScore = state.score + timeBonus;
+  const stars = totalScore > 5000 ? 3 : totalScore > 2000 ? 2 : 1;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-lg animate-fade-in" />
+
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {fallingCards.map(card => (
+          <div
+            key={card.id}
+            className="absolute rounded-md flex items-center justify-center text-center"
+            style={{
+              left: `${card.x}%`,
+              top: '-80px',
+              width: `${card.size * 38}px`,
+              height: `${card.size * 54}px`,
+              background: 'linear-gradient(145deg, #fffef7, #f9f7ea)',
+              border: '1px solid rgba(209,213,219,0.8)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              color: card.red ? '#dc2626' : '#1e293b',
+              fontSize: `${card.size * 13}px`,
+              fontWeight: 'bold',
+              transform: `rotate(${card.rotation}deg)`,
+              animation: `cardRain ${card.duration}s ease-in ${card.delay}s infinite`,
+            }}
+          >
+            <div className="flex flex-col items-center leading-none">
+              <span>{card.rank}</span>
+              <span>{card.suit}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm animate-win-bounce">
+        <div
+          className="rounded-3xl p-8 text-center relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(145deg, rgba(15,23,42,0.97), rgba(30,41,59,0.97))',

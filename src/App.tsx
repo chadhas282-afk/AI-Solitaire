@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, createContext, useContext, useReducer } from 'react';
-import { useDraggable, useDroppable, DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors, closestCorners} from '@dnd-kit/core';
+import { useDraggable, useDroppable, DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors, closestCorners } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 
 export type Suit = 'spades' | 'hearts' | 'diamonds' | 'clubs';
@@ -12,7 +12,7 @@ export interface Card {
   suit: Suit;
   rank: Rank;
   faceUp: boolean;
-  justDealt?: boolean; 
+  justDealt?: boolean;
 }
 
 export type PileType = 'stock' | 'waste' | 'foundation' | 'tableau';
@@ -66,12 +66,12 @@ export interface GameState {
   timerActive: boolean;
   stockRecycles: number;
   lastAction: string;
-  combo: number;           
+  combo: number;
   bestCombo: number;
   particleEvents: ParticleEvent[];
   toastMessage: string | null;
   toastKey: number;
-  foundationCount: number; 
+  foundationCount: number;
 }
 
 export const SUIT_ORDER: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
@@ -209,7 +209,7 @@ export function getColor(suit: Suit): Color {
 export function canMoveToFoundation(card: Card, foundation: Card[]): boolean {
   if (!card.faceUp) return false;
   if (foundation.length === 0) {
-    return card.rank === 1; 
+    return card.rank === 1;
   }
   const top = foundation[foundation.length - 1];
   return card.suit === top.suit && card.rank === top.rank + 1;
@@ -218,7 +218,7 @@ export function canMoveToFoundation(card: Card, foundation: Card[]): boolean {
 export function canMoveToTableau(card: Card, tableau: Card[]): boolean {
   if (!card.faceUp) return false;
   if (tableau.length === 0) {
-    return card.rank === 13; 
+    return card.rank === 13;
   }
   const top = tableau[tableau.length - 1];
   if (!top.faceUp) return false;
@@ -227,7 +227,6 @@ export function canMoveToTableau(card: Card, tableau: Card[]): boolean {
 
 export function getMovableSequence(column: Card[], fromIndex: number): Card[] {
   if (fromIndex < 0 || fromIndex >= column.length) return [];
-
   if (!column[fromIndex].faceUp) return [];
   return column.slice(fromIndex);
 }
@@ -243,23 +242,19 @@ export function findCardInTableau(cardId: string, tableau: Card[][]): { colIndex
 }
 
 export function findCard(cardId: string, state: GameState): { pile: PileRef; card: Card } | null {
-
   for (const card of state.waste) {
     if (card.id === cardId) return { pile: { type: 'waste' }, card };
   }
-
   for (let i = 0; i < state.foundations.length; i++) {
     for (const card of state.foundations[i]) {
       if (card.id === cardId) return { pile: { type: 'foundation', index: i }, card };
     }
   }
-
   for (let i = 0; i < state.tableau.length; i++) {
     for (const card of state.tableau[i]) {
       if (card.id === cardId) return { pile: { type: 'tableau', index: i }, card };
     }
   }
-
   for (const card of state.stock) {
     if (card.id === cardId) return { pile: { type: 'stock' }, card };
   }
@@ -270,21 +265,18 @@ export function wouldRevealCard(cardId: string, tableau: Card[][]): boolean {
   for (const col of tableau) {
     const idx = col.findIndex(c => c.id === cardId);
     if (idx === -1) continue;
-
     if (idx > 0 && !col[idx - 1].faceUp) return true;
-    if (idx === 0) return false; 
+    if (idx === 0) return false;
   }
   return false;
 }
 
 export function hasAnyValidMove(state: GameState): boolean {
   const { stock, waste, foundations, tableau } = state;
-
   if (stock.length > 0) return true;
   if (waste.length > 0) return true;
 
   const allVisibleCards: { card: Card; pile: PileRef }[] = [];
-
   if (waste.length > 0) {
     allVisibleCards.push({ card: waste[waste.length - 1], pile: { type: 'waste' } });
   }
@@ -294,23 +286,19 @@ export function hasAnyValidMove(state: GameState): boolean {
     for (let j = col.length - 1; j >= 0; j--) {
       if (col[j].faceUp) {
         allVisibleCards.push({ card: col[j], pile: { type: 'tableau', index: i } });
-
         if (j === col.findIndex(c => c.faceUp)) break;
       }
     }
   }
 
   for (const { card } of allVisibleCards) {
-
     for (const f of foundations) {
       if (canMoveToFoundation(card, f)) return true;
     }
-
     for (const col of tableau) {
       if (canMoveToTableau(card, col)) return true;
     }
   }
-
   return false;
 }
 
@@ -361,13 +349,10 @@ export function findBestHint(state: GameState): HintMove | null {
 
   for (let fromCol = 0; fromCol < tableau.length; fromCol++) {
     const col = tableau[fromCol];
-
     const firstFaceUpIdx = col.findIndex(c => c.faceUp);
-    if (firstFaceUpIdx === -1) continue;
+    if (firstFaceUpIdx <= 0) continue;
 
-    if (firstFaceUpIdx === 0) continue;
-
-    const card = col[firstFaceUpIdx]; 
+    const card = col[firstFaceUpIdx];
     for (let toCol = 0; toCol < tableau.length; toCol++) {
       if (toCol === fromCol) continue;
       if (canMoveToTableau(card, tableau[toCol])) {
@@ -400,7 +385,7 @@ export function findBestHint(state: GameState): HintMove | null {
     const firstFaceUpIdx = col.findIndex(c => c.faceUp);
     if (firstFaceUpIdx === -1) continue;
     const card = col[firstFaceUpIdx];
-    if (card.rank === 13) continue; 
+    if (card.rank === 13) continue;
     for (let toCol = 0; toCol < tableau.length; toCol++) {
       if (toCol === fromCol) continue;
       if (canMoveToTableau(card, tableau[toCol])) {
@@ -416,7 +401,6 @@ export function findBestHint(state: GameState): HintMove | null {
 
   const hasEmptyCol = tableau.some(col => col.length === 0);
   if (hasEmptyCol) {
-
     if (waste.length > 0 && waste[waste.length - 1].rank === 13) {
       const card = waste[waste.length - 1];
       const emptyColIdx = tableau.findIndex(col => col.length === 0);
@@ -466,7 +450,7 @@ export function findBestHint(state: GameState): HintMove | null {
     };
   }
 
-  return null; 
+  return null;
 }
 
 export function findAutoCompleteMove(state: GameState): { cardId: string; fromPile: PileRef; foundationIndex: number } | null {
@@ -502,7 +486,7 @@ export function isDeadEnd(state: GameState): boolean {
 
   if (stock.length > 0) return false;
 
-  const topCards: { card: typeof waste[0]; pile: PileRef }[] = [];
+  const topCards: { card: Card; pile: PileRef }[] = [];
 
   if (waste.length > 0) {
     topCards.push({ card: waste[waste.length - 1], pile: { type: 'waste' } });
@@ -549,7 +533,7 @@ const POINTS = {
   WASTE_TO_TABLEAU: 5,
   FOUNDATION_TO_TABLEAU: -15,
   UNDO: -15,
-  COMBO_BONUS: 25,   
+  COMBO_BONUS: 25,
 };
 
 const MAX_HISTORY = 100;
@@ -573,7 +557,6 @@ function pushHistory(state: GameState): GameState['history'] {
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-
     case 'NEW_GAME':
       return createInitialState(action.drawCount ?? state.drawCount);
 
@@ -951,10 +934,10 @@ export function EmptyPile({ pileRef, suit, label, className = '' }: EmptyPilePro
 }
 
 const SUIT_CARD_STYLE: Record<string, { text: string; shadow: string; accent: string }> = {
-  hearts:   { text: '#dc2626', shadow: 'rgba(220,38,38,0.15)',   accent: '#fef2f2' },
-  diamonds: { text: '#c2410c', shadow: 'rgba(194,65,12,0.15)',   accent: '#fff7ed' },
-  spades:   { text: '#1e293b', shadow: 'rgba(30,41,59,0.15)',    accent: '#f8fafc' },
-  clubs:    { text: '#14532d', shadow: 'rgba(20,83,45,0.15)',    accent: '#f0fdf4' },
+  hearts: { text: '#dc2626', shadow: 'rgba(220,38,38,0.15)', accent: '#fef2f2' },
+  diamonds: { text: '#c2410c', shadow: 'rgba(194,65,12,0.15)', accent: '#fff7ed' },
+  spades: { text: '#1e293b', shadow: 'rgba(30,41,59,0.15)', accent: '#f8fafc' },
+  clubs: { text: '#14532d', shadow: 'rgba(20,83,45,0.15)', accent: '#f0fdf4' },
 };
 
 interface CardProps {
@@ -967,7 +950,7 @@ interface CardProps {
 }
 
 export function CardComponent({
-  card, fromPile, cardIndex = 0, style, isTop = false, isDragOverlay = false,
+  card, fromPile, cardIndex = 0, style, isDragOverlay = false,
 }: CardProps) {
   const { state, dispatch } = useGame();
   const draggableId = `${card.id}::${fromPile.type}::${fromPile.index ?? 'x'}`;
@@ -979,7 +962,6 @@ export function CardComponent({
   });
 
   const isHintSource = state.hint?.cardId === card.id;
-  const isRed = SUIT_COLORS[card.suit] === 'red';
   const styles = SUIT_CARD_STYLE[card.suit];
 
   const dragStyle: React.CSSProperties = transform
@@ -1011,37 +993,30 @@ export function CardComponent({
         `}
         {...attributes}
         {...listeners}
-
       >
-
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2847 50%, #1a3560 100%)',
         }} />
-
         <div className="absolute inset-[3px] rounded-lg border border-blue-400/20" />
-
         <div className="absolute inset-0 opacity-20" style={{
           backgroundImage: `repeating-linear-gradient(45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px),
                             repeating-linear-gradient(-45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px)`,
         }} />
-
-        {['tl','tr','bl','br'].map(pos => (
+        {['tl', 'tr', 'bl', 'br'].map(pos => (
           <div key={pos} className={`absolute w-1.5 h-1.5 rounded-full bg-blue-300/30
             ${pos.includes('t') ? 'top-2' : 'bottom-2'}
             ${pos.includes('l') ? 'left-2' : 'right-2'}`} />
         ))}
-
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-blue-300/15 text-3xl select-none font-bold">♦</span>
         </div>
-
         <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/8 to-transparent rounded-t-xl pointer-events-none" />
       </div>
     );
   }
 
-  const rankLabel = RANK_LABELS[card.rank];
-  const suitSymbol = SUIT_SYMBOLS[card.suit];
+  const rankLbl = RANK_LABELS[card.rank];
+  const suitSym = SUIT_SYMBOLS[card.suit];
   const isFaceCard = card.rank >= 11;
 
   return (
@@ -1069,31 +1044,28 @@ export function CardComponent({
       {...attributes}
       {...listeners}
     >
-
       <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none" style={{ color: styles.text }}>
-        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLabel}</span>
-        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSymbol}</span>
+        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLbl}</span>
+        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSym}</span>
       </div>
 
       {isFaceCard ? (
-
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
           <span className="text-3xl sm:text-4xl lg:text-[2.6rem] leading-none select-none" style={{
             color: styles.text,
             textShadow: `0 2px 8px ${styles.shadow}`,
-          }}>{suitSymbol}</span>
+          }}>{suitSym}</span>
           <span className="text-[10px] sm:text-xs font-display font-bold uppercase tracking-widest opacity-40" style={{ color: styles.text }}>
-            {rankLabel === 'J' ? 'Jack' : rankLabel === 'Q' ? 'Queen' : 'King'}
+            {rankLbl === 'J' ? 'Jack' : rankLbl === 'Q' ? 'Queen' : 'King'}
           </span>
         </div>
       ) : (
-
-        <PipGrid rank={card.rank} symbol={suitSymbol} color={styles.text} />
+        <PipGrid rank={card.rank} symbol={suitSym} color={styles.text} />
       )}
 
       <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180" style={{ color: styles.text }}>
-        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLabel}</span>
-        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSymbol}</span>
+        <span className="text-sm sm:text-[15px] font-black font-display leading-none">{rankLbl}</span>
+        <span className="text-[11px] sm:text-xs leading-none mt-[-1px]">{suitSym}</span>
       </div>
 
       <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/50 to-transparent rounded-t-xl pointer-events-none" />
@@ -1130,15 +1102,15 @@ function getPipPositions(rank: number): { x: number; y: number; flip?: boolean }
   const L = 25, R = 75, C = 50;
   const T = 15, TM = 35, M = 50, BM = 65, B = 85;
   switch (rank) {
-    case 1:  return [{ x: C, y: M }];
-    case 2:  return [{ x: C, y: T }, { x: C, y: B, flip: true }];
-    case 3:  return [{ x: C, y: T }, { x: C, y: M }, { x: C, y: B, flip: true }];
-    case 4:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
-    case 5:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
-    case 6:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
-    case 7:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
-    case 8:  return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: C, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
-    case 9:  return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: TM }, { x: R, y: TM }, { x: C, y: M }, { x: L, y: BM, flip: true }, { x: R, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 1: return [{ x: C, y: M }];
+    case 2: return [{ x: C, y: T }, { x: C, y: B, flip: true }];
+    case 3: return [{ x: C, y: T }, { x: C, y: M }, { x: C, y: B, flip: true }];
+    case 4: return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 5: return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 6: return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 7: return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 8: return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM }, { x: L, y: M }, { x: R, y: M }, { x: C, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
+    case 9: return [{ x: L, y: T }, { x: R, y: T }, { x: L, y: TM }, { x: R, y: TM }, { x: C, y: M }, { x: L, y: BM, flip: true }, { x: R, y: BM, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
     case 10: return [{ x: L, y: T }, { x: R, y: T }, { x: C, y: TM - 5 }, { x: L, y: TM }, { x: R, y: TM }, { x: L, y: BM, flip: true }, { x: R, y: BM, flip: true }, { x: C, y: BM + 5, flip: true }, { x: L, y: B, flip: true }, { x: R, y: B, flip: true }];
     default: return [];
   }
@@ -1146,8 +1118,8 @@ function getPipPositions(rank: number): { x: number; y: number; flip?: boolean }
 
 export function CardDragOverlay({ card }: { card: Card }) {
   const styles = SUIT_CARD_STYLE[card.suit];
-  const rankLabel = RANK_LABELS[card.rank];
-  const suitSymbol = SUIT_SYMBOLS[card.suit];
+  const rankLbl = RANK_LABELS[card.rank];
+  const suitSym = SUIT_SYMBOLS[card.suit];
 
   return (
     <div
@@ -1160,15 +1132,15 @@ export function CardDragOverlay({ card }: { card: Card }) {
       }}
     >
       <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none" style={{ color: styles.text }}>
-        <span className="text-[15px] font-black font-display leading-none">{rankLabel}</span>
-        <span className="text-xs leading-none">{suitSymbol}</span>
+        <span className="text-[15px] font-black font-display leading-none">{rankLbl}</span>
+        <span className="text-xs leading-none">{suitSym}</span>
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-4xl select-none" style={{ color: styles.text, opacity: 0.7 }}>{suitSymbol}</span>
+        <span className="text-4xl select-none" style={{ color: styles.text, opacity: 0.7 }}>{suitSym}</span>
       </div>
       <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180" style={{ color: styles.text }}>
-        <span className="text-[15px] font-black font-display leading-none">{rankLabel}</span>
-        <span className="text-xs leading-none">{suitSymbol}</span>
+        <span className="text-[15px] font-black font-display leading-none">{rankLbl}</span>
+        <span className="text-xs leading-none">{suitSym}</span>
       </div>
       <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/50 to-transparent rounded-t-xl pointer-events-none" />
     </div>
@@ -1193,7 +1165,6 @@ export function StockPile() {
         title={isEmpty ? 'Recycle waste' : `Draw ${state.drawCount} card(s)`}
         aria-label={isEmpty ? 'Recycle waste' : 'Draw from stock'}
       >
-
         {!isEmpty && stackDepth >= 3 && (
           <div className="absolute rounded-xl"
             style={{
@@ -1229,7 +1200,6 @@ export function StockPile() {
           }}
         >
           {isEmpty ? (
-
             <div className="inset-0 absolute flex flex-col items-center justify-center gap-1.5 rounded-xl"
               style={{
                 background: 'rgba(0,0,0,0.2)',
@@ -1244,11 +1214,9 @@ export function StockPile() {
               )}
             </div>
           ) : (
-
             <div className="absolute inset-0" style={{
               background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2847 50%, #1a3560 100%)',
             }}>
-
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: `repeating-linear-gradient(45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px),
                                   repeating-linear-gradient(-45deg, #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 8px)`,
@@ -1268,7 +1236,7 @@ export function StockPile() {
 }
 
 export function WastePile() {
-  const { state, dispatch } = useGame();
+  const { state } = useGame();
   const { waste, drawCount } = state;
 
   const { setNodeRef, isOver } = useDroppable({
@@ -1289,7 +1257,7 @@ export function WastePile() {
     ? waste.slice(Math.max(0, waste.length - 3))
     : waste.slice(-1);
 
-  const fanOffset = 18; 
+  const fanOffset = 18;
 
   return (
     <div className="flex flex-col items-center gap-1.5">
@@ -1334,10 +1302,10 @@ export function WastePile() {
 }
 
 const FOUNDATION_GLOW: Record<string, string> = {
-  spades:   'rgba(139,92,246,0.4)',
-  hearts:   'rgba(239,68,68,0.4)',
+  spades: 'rgba(139,92,246,0.4)',
+  hearts: 'rgba(239,68,68,0.4)',
   diamonds: 'rgba(249,115,22,0.4)',
-  clubs:    'rgba(34,197,94,0.4)',
+  clubs: 'rgba(34,197,94,0.4)',
 };
 
 export function FoundationPiles() {
@@ -1371,7 +1339,7 @@ function FoundationPile({ index }: { index: number }) {
       <div
         ref={(el) => {
           setNodeRef(el);
-          (pileRef as any).current = el;
+          (pileRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
         }}
         className={`
           relative rounded-xl transition-all duration-200
@@ -1380,7 +1348,7 @@ function FoundationPile({ index }: { index: number }) {
         `}
         style={{
           boxShadow: isOver ? `0 0 20px ${glow}, 0 0 8px ${glow}` :
-                     isComplete ? `0 0 16px ${glow}` : 'none',
+            isComplete ? `0 0 16px ${glow}` : 'none',
           transition: 'box-shadow 0.3s ease',
         }}
       >
@@ -1440,7 +1408,7 @@ function TableauColumn({ colIndex }: { colIndex: number }) {
 
   const faceDownCount = column.filter(c => !c.faceUp).length;
   const faceUpCount = column.filter(c => c.faceUp).length;
-  const cardHeightPx = 92; 
+  const cardHeightPx = 92;
   const columnHeight =
     faceDownCount * FACE_DOWN_OFFSET +
     faceUpCount * FACE_UP_OFFSET +
@@ -1576,13 +1544,10 @@ export function Dashboard() {
   };
 
   const canUndo = state.history.length > 0;
-  const hint = state.hint;
 
   return (
     <div className="w-full">
-
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 sm:px-5">
-
         <div className="flex items-center gap-2.5">
           <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-xl shadow-lg shadow-emerald-500/30 object-cover border border-white/10" />
           <div className="hidden sm:block">
@@ -1736,9 +1701,8 @@ function ActionBtn({
 }
 
 export function Board() {
-  const { state, dispatch } = useGame();
+  const { dispatch } = useGame();
   const [draggingCard, setDraggingCard] = useState<Card | null>(null);
-  const [draggingFrom, setDraggingFrom] = useState<PileRef | null>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -1750,14 +1714,12 @@ export function Board() {
     const { data } = event.active;
     if (data.current) {
       setDraggingCard(data.current.card as Card);
-      setDraggingFrom(data.current.fromPile as PileRef);
     }
     dispatch({ type: 'CLEAR_HINT' });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     setDraggingCard(null);
-    setDraggingFrom(null);
     const { active, over } = event;
     if (!over || !active.data.current) return;
 
@@ -1791,7 +1753,6 @@ export function Board() {
       }
       return;
     }
-
   };
 
   return (
@@ -1802,7 +1763,6 @@ export function Board() {
       onDragEnd={handleDragEnd}
     >
       <div ref={dropZoneRef} className="flex flex-col gap-3 sm:gap-4 w-full">
-
         <div className="flex items-start justify-between gap-2 px-2 sm:px-4">
           <div className="flex items-start gap-1.5 sm:gap-2.5">
             <StockPile />
@@ -1843,7 +1803,7 @@ interface FallingCard {
   size: number;
 }
 
-const RANKS_LABELS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const RANKS_LABELS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 export function WinModal() {
   const { state, dispatch } = useGame();
@@ -1883,7 +1843,6 @@ export function WinModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-
       <div className="absolute inset-0 bg-black/70 backdrop-blur-lg animate-fade-in" />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -1923,7 +1882,6 @@ export function WinModal() {
             boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
           }}
         >
-
           <div className="absolute inset-0 pointer-events-none" style={{
             background: 'radial-gradient(circle at 50% 0%, rgba(16,185,129,0.15), transparent 60%)',
           }} />
@@ -1939,7 +1897,7 @@ export function WinModal() {
           <p className="text-white/30 text-xs tracking-widest uppercase mb-4">Game Complete</p>
 
           <div className="flex items-center justify-center gap-1 mb-5">
-            {[1,2,3].map(n => (
+            {[1, 2, 3].map(n => (
               <span key={n} className="text-2xl transition-all duration-300"
                 style={{
                   filter: n <= stars ? 'drop-shadow(0 0 8px rgba(245,158,11,0.8))' : 'none',
@@ -2084,7 +2042,7 @@ export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
         ...p,
         x: p.x + p.vx,
         y: p.y + p.vy,
-        vy: p.vy + 0.3, 
+        vy: p.vy + 0.3,
         opacity: 1 - progress,
         rotation: p.rotation + p.rotationSpeed,
         vx: p.vx * 0.97,
@@ -2093,7 +2051,7 @@ export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
     };
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [eventId]);
+  }, [eventId, suit]);
 
   if (done || particles.length === 0) return null;
 
@@ -2138,7 +2096,7 @@ export function Toast({ message, toastKey }: ToastProps) {
     setVisible(true);
     const t = setTimeout(() => setVisible(false), 1600);
     return () => clearTimeout(t);
-  }, [toastKey]);
+  }, [toastKey, message]);
 
   if (!visible || !message) return null;
 
@@ -2178,7 +2136,6 @@ function GameScene() {
   const { state } = useGame();
   return (
     <>
-
       {state.particleEvents.map(evt => (
         <ParticleBurst
           key={evt.id}
@@ -2201,11 +2158,9 @@ function GameScene() {
 export default function App() {
   return (
     <GameProvider>
-
       <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
         background: 'linear-gradient(160deg, #0a1628 0%, #0f2a1e 40%, #0a1628 100%)',
       }}>
-
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="aurora-blob aurora-1" />
           <div className="aurora-blob aurora-2" />
@@ -2279,4 +2234,3 @@ export default function App() {
     </GameProvider>
   );
 }
-

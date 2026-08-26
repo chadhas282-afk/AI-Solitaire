@@ -118,7 +118,7 @@ export function createDeck(): Card[] {
     for (const rank of RANKS) {
       deck.push({ id: `${suit}-${rank}`, suit, rank, faceUp: false });
     }
-     }
+  }
   return deck;
 }
 
@@ -198,7 +198,7 @@ export function snapshotState(state: GameState) {
     score: state.score,
     moves: state.moves,
     combo: state.combo,
-    };
+  };
 }
 
 export function getColor(suit: Suit): Color {
@@ -318,7 +318,7 @@ export function canAutoComplete(state: GameState): boolean {
     if (col.some(c => !c.faceUp)) return false;
   }
   return true;
-  }
+}
 
 export function isWon(state: GameState): boolean {
   return state.foundations.reduce((sum, f) => sum + f.length, 0) === 52;
@@ -478,7 +478,7 @@ export function findAutoCompleteMove(state: GameState): { cardId: string; fromPi
         return { cardId: card.id, fromPile: { type: 'waste' }, foundationIndex: fi };
       }
     }
-    }
+  }
 
   for (let ti = 0; ti < tableau.length; ti++) {
     const col = tableau[ti];
@@ -518,7 +518,7 @@ export function isDeadEnd(state: GameState): boolean {
   for (const { card } of topCards) {
     for (const f of foundations) {
       if (canMoveToFoundation(card, f)) return false;
-      }
+    }
     for (const col of tableau) {
       if (canMoveToTableau(card, col)) return false;
     }
@@ -558,7 +558,7 @@ function getComboMessage(combo: number): string | null {
   if (combo === 2) return '2x Combo! 🔥';
   if (combo === 3) return '3x Combo! 🔥🔥';
   if (combo === 4) return '4x Combo! 💥';
-   if (combo === 5) return '5x Blazing! 🌟';
+  if (combo === 5) return '5x Blazing! 🌟';
   if (combo >= 6) return `${combo}x UNSTOPPABLE! ⚡`;
   return null;
 }
@@ -638,7 +638,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         cardsToMove = [{ ...card, faceUp: true }];
         newState.waste = state.waste.slice(0, -1);
         scoreChange += POINTS.WASTE_TO_TABLEAU;
-        } else if (fromPile.type === 'tableau') {
+      } else if (fromPile.type === 'tableau') {
         const colIdx = fromPile.index!;
         const col = state.tableau[colIdx];
         const cardIdx = col.findIndex(c => c.id === cardId);
@@ -918,7 +918,7 @@ export function EmptyPile({ pileRef, suit, label, className = '' }: EmptyPilePro
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId,
     data: { pileRef },
-    });
+  });
 
   return (
     <div
@@ -998,7 +998,7 @@ export function CardComponent({
         ref={setNodeRef}
         style={{
           ...style,
-           ...dragStyle,
+          ...dragStyle,
           boxShadow: '0 3px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3)',
         }}
         className={`
@@ -1118,7 +1118,7 @@ function PipGrid({ rank, symbol, color }: { rank: number; symbol: string; color:
             }}
           >
             {symbol}
-             </div>
+          </div>
         ))}
       </div>
     </div>
@@ -1358,7 +1358,7 @@ function FoundationPile({ index }: { index: number }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `foundation::${index}`,
     data: { pileRef: { type: 'foundation', index } },
-     });
+  });
 
   const topCard = foundation.length > 0 ? foundation[foundation.length - 1] : null;
   const isComplete = foundation.length === 13;
@@ -1398,7 +1398,7 @@ function FoundationPile({ index }: { index: number }) {
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent"
               style={{ animation: 'shimmer 2s ease-in-out infinite' }} />
           </div>
-            )}
+        )}
 
         {foundation.length > 0 && (
           <div className="absolute -top-1.5 -right-1.5 text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center z-10 shadow"
@@ -1439,7 +1439,7 @@ function TableauColumn({ colIndex }: { colIndex: number }) {
 
   const faceDownCount = column.filter(c => !c.faceUp).length;
   const faceUpCount = column.filter(c => c.faceUp).length;
-   const cardHeightPx = 92; 
+  const cardHeightPx = 92; 
   const columnHeight =
     faceDownCount * FACE_DOWN_OFFSET +
     faceUpCount * FACE_UP_OFFSET +
@@ -1478,7 +1478,7 @@ function TableauColumn({ colIndex }: { colIndex: number }) {
       `}
       style={{ height: `${columnHeight}px`, minHeight: `${cardHeightPx}px` }}
     >
-       {column.map((card, cardIndex) => {
+      {column.map((card, cardIndex) => {
         const prevFaceDown = column.slice(0, cardIndex).filter(c => !c.faceUp).length;
         const prevFaceUp = cardIndex - prevFaceDown;
         const topOffset = prevFaceDown * FACE_DOWN_OFFSET + prevFaceUp * FACE_UP_OFFSET;
@@ -1558,7 +1558,7 @@ export function Dashboard() {
   };
 
   const handleAutoComplete = () => {
-     dispatch({ type: 'AUTO_COMPLETE_STEP' });
+    dispatch({ type: 'AUTO_COMPLETE_STEP' });
   };
 
   const handleNewGame = () => {
@@ -1598,7 +1598,7 @@ export function Dashboard() {
           <StatChip label="Time" value={formatTime(state.elapsedTime)} glowColor="violet" mono />
 
           {state.combo >= 2 && (
-             <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-display font-bold"
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-display font-bold"
               style={{
                 background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
                 color: 'white',
@@ -1678,7 +1678,7 @@ export function Dashboard() {
           <span className="text-red-400">🚫</span>
           <span className="text-red-300/80 font-medium">No more moves — game over!</span>
           <button onClick={handleNewGame}
-          className="ml-auto text-red-300 hover:text-red-200 font-semibold underline transition-colors">New Game</button>
+            className="ml-auto text-red-300 hover:text-red-200 font-semibold underline transition-colors">New Game</button>
         </div>
       )}
 
@@ -1718,7 +1718,7 @@ function ActionBtn({
   const base = 'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-display font-semibold transition-all duration-200 active:scale-95 border focus:outline-none';
   const styles = {
     ghost: `bg-white/8 hover:bg-white/12 text-white/60 hover:text-white/80 border-white/8`,
-     amber: `bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/25 shadow-sm shadow-amber-500/10`,
+    amber: `bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/25 shadow-sm shadow-amber-500/10`,
     emerald: `bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/25 shadow-sm shadow-emerald-500/10`,
   };
   return (
@@ -1758,7 +1758,7 @@ export function Board() {
     setDraggingCard(null);
     setDraggingFrom(null);
     const { active, over } = event;
-     if (!over || !active.data.current) return;
+    if (!over || !active.data.current) return;
 
     const card = active.data.current.card as Card;
     const fromPile = active.data.current.fromPile as PileRef;
@@ -1918,7 +1918,7 @@ export function WinModal() {
           className="rounded-3xl p-8 text-center relative overflow-hidden"
           style={{
             background: 'linear-gradient(145deg, rgba(15,23,42,0.97), rgba(30,41,59,0.97))',
-             border: '1px solid rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.08)',
             boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
           }}
         >
@@ -1958,7 +1958,7 @@ export function WinModal() {
               <div key={s.label}
                 className="rounded-xl px-3 py-2.5 text-center"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div className="text-white/25 text-[9px] uppercase tracking-widest">{s.label}</div>
+                <div className="text-white/25 text-[9px] uppercase tracking-widest">{s.label}</div>
                 <div className="text-white font-display font-bold text-sm mt-0.5">
                   {s.icon} {s.value}
                 </div>
@@ -1998,7 +1998,7 @@ export function WinModal() {
 
       <style>{`
         @keyframes cardRain {
-        0%   { transform: translateY(0) rotate(var(--rot, 5deg)); opacity: 0; }
+          0%   { transform: translateY(0) rotate(var(--rot, 5deg)); opacity: 0; }
           10%  { opacity: 1; }
           90%  { opacity: 1; }
           100% { transform: translateY(110vh) rotate(calc(var(--rot, 5deg) + 180deg)); opacity: 0; }
@@ -2038,7 +2038,7 @@ const SUIT_PARTICLE_COLORS: Record<Suit, string[]> = {
   diamonds: ['#fb923c', '#fbbf24', '#f87171', '#e11d48'],
   spades: ['#818cf8', '#a78bfa', '#60a5fa', '#c4b5fd'],
   clubs: ['#34d399', '#4ade80', '#a3e635', '#86efac'],
-  };
+};
 
 export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -2118,7 +2118,7 @@ export function ParticleBurst({ x, y, suit, eventId }: ParticleBurstProps) {
           }}
         >
           {p.char}
-           </div>
+        </div>
       ))}
     </div>
   );
@@ -2158,7 +2158,7 @@ export function Toast({ message, toastKey }: ToastProps) {
           : isUndo
             ? 'bg-white/10 text-white/70 backdrop-blur-md border border-white/10'
             : 'bg-emerald-500/90 text-white shadow-emerald-500/40'
-            }
+        }
       `}
       style={{ animation: visible ? 'toastPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined }}
     >
@@ -2238,3 +2238,44 @@ export default function App() {
             All AI logic runs locally · No external APIs
           </p>
         </footer>
+
+        <GameScene />
+      </div>
+
+      <style>{`
+        .aurora-blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.25;
+          animation: auroraFloat 12s ease-in-out infinite;
+        }
+        .aurora-1 {
+          width: 500px; height: 400px;
+          left: -10%; top: 20%;
+          background: radial-gradient(circle, #10b981, transparent 70%);
+          animation-delay: 0s; animation-duration: 14s;
+        }
+        .aurora-2 {
+          width: 400px; height: 350px;
+          right: -5%; top: 5%;
+          background: radial-gradient(circle, #6366f1, transparent 70%);
+          animation-delay: -5s; animation-duration: 11s;
+        }
+        .aurora-3 {
+          width: 350px; height: 300px;
+          left: 30%; bottom: 10%;
+          background: radial-gradient(circle, #0891b2, transparent 70%);
+          animation-delay: -8s; animation-duration: 16s;
+        }
+        @keyframes auroraFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25%  { transform: translate(30px, -20px) scale(1.05); }
+          50%  { transform: translate(-20px, 30px) scale(0.95); }
+          75%  { transform: translate(20px, 10px) scale(1.02); }
+        }
+      `}</style>
+    </GameProvider>
+  );
+}
+

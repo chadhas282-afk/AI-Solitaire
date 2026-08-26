@@ -1998,3 +1998,43 @@ export function WinModal() {
 
       <style>{`
         @keyframes cardRain {
+        0%   { transform: translateY(0) rotate(var(--rot, 5deg)); opacity: 0; }
+          10%  { opacity: 1; }
+          90%  { opacity: 1; }
+          100% { transform: translateY(110vh) rotate(calc(var(--rot, 5deg) + 180deg)); opacity: 0; }
+        }
+        @keyframes shimmer {
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  char: string;
+  size: number;
+  opacity: number;
+  rotation: number;
+  rotationSpeed: number;
+}
+
+interface ParticleBurstProps {
+  x: number;
+  y: number;
+  suit: Suit;
+  eventId: number;
+}
+
+const SUIT_PARTICLE_COLORS: Record<Suit, string[]> = {
+  hearts: ['#f87171', '#fb923c', '#fbbf24', '#f43f5e'],
+  diamonds: ['#fb923c', '#fbbf24', '#f87171', '#e11d48'],
+  spades: ['#818cf8', '#a78bfa', '#60a5fa', '#c4b5fd'],
+  clubs: ['#34d399', '#4ade80', '#a3e635', '#86efac'],
